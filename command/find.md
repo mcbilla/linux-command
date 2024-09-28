@@ -112,23 +112,13 @@ $ find . -regex ".*\(\.txt\|\.pdf\)$"
 $ find . -iregex ".*\(\.txt\|\.pdf\)$"
 ```
 
-#### 2、查找文件内容
-显示文件名+内容
-```
-grep -r "查询内容"  文件目录
-```
-只显示包含内容的文件名
-```
-grep -r -l "查询内容"  文件目录
-```
-
-#### 3、反向查找
+#### 2、反向查找
 找出/home下不是以.txt结尾的文件
 ```
 $ find /home ! -name "*.txt"
 ```
 
-#### 4、根据文件类型查找
+#### 3、根据文件类型查找
 查找目前目录及所有子目录的一般文件
 ```
 $ find . -type f
@@ -142,7 +132,7 @@ $ find . -maxdepth 3 -type f
 $ find . -mindepth 2 -type f
 ```
 
-#### 5、根据时间戳查找
+#### 4、根据时间戳查找
 UNIX/Linux文件系统每个文件都有三种时间戳：
 * 访问时间 （-atime/天，-amin/分钟）：用户最近一次访问时间。
 * 修改时间 （-mtime/天，-mmin/分钟）：文件最后一次修改时间。
@@ -169,7 +159,7 @@ $ find . -type f -amin +10
 $ find . -type f -newer file.log
 ```
 
-#### 6、根据文件大小进行匹配
+#### 5、根据文件大小进行匹配
 搜索大于10KB的文件
 ```
 $ find . -type f -size +10k
@@ -183,13 +173,13 @@ $ find . -type f -size -10k
 $ find . -type f -size 10k
 ```
 
-#### 7、删除匹配文件
+#### 6、删除匹配文件
 删除当前目录下所有.txt文件
 ```
 $ find . -type f -name "*.txt" -delete
 ```
 
-#### 8、根据文件权限/所有权进行匹配
+#### 7、根据文件权限/所有权进行匹配
 当前目录下搜索出权限为777的文件
 ```
 $ find . -type f -perm 777
@@ -207,7 +197,7 @@ $ find . -type f -user tom
 $ find . -type f -group sunk
 ```
 
-#### 9、与其他命令结合使用
+#### 8、与其他命令结合使用
 找出当前目录下所有root的文件，并把所有权更改为用户tom
 ```
 $ find .-type f -user root -exec chown tom {} \;
@@ -221,7 +211,7 @@ find $HOME/. -name "*.txt" -ok rm {} \;
 -exec ./text.sh {} \;
 ```
 
-#### 10、搜索但跳过指定目录
+#### 9、搜索但跳过指定目录
 查找当前目录或者子目录下所有.txt文件，但是跳过子目录sk
 ```
 # ./sk 不能写成 ./sk/ ，否则没有作用。
@@ -233,7 +223,7 @@ find . -path "./sk" -prune -o -name "*.txt" -print
 $ find . \( -path ./sk -o  -path ./st \) -prune -o -name "*.txt" -print
 ```
 
-#### 11、其他
+#### 10、其他
 找到七天前修改过的文件类型为jpeg或jpg的文件
 ```
 $ find ~ \( -iname '*jpeg' -o -iname '*jpg' \) -type f -mtime -7
