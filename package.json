@@ -2,7 +2,7 @@
   "name": "linux-command",
   "version": "1.19.1",
   "description": "Linux Command",
-  "homepage": "https://jaywcjlove.github.io/linux-command/",
+  "homepage": "https://mcbilla.github.io/linux-command/",
   "main": "dist/data.json",
   "scripts": {
     "start": "npm run build",
@@ -22,7 +22,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jaywcjlove/linux-command.git"
+    "url": "git+https://github.com/mcbilla/linux-command.git"
   },
   "devDependencies": {
     "@uiw/github-corners": "~1.5.11",
