@@ -1,159 +1,154 @@
 free
 ===
 
-显示内存的使用情况
+显示物理内存和交换空间的使用情况
 
 ## 补充说明
 
-**free命令** 可以显示当前系统未使用的和已使用的内存数目，还可以显示被内核使用的内存缓冲区。
+**free命令** 是一个用来显示系统物理内存和交换空间的使用情况的命令。它可以提供关于总量、已用、空闲、共享、缓冲和缓存的内存的信息。它还可以显示可用的内存，这是一个估计值，表示可以用来满足应用程序内存请求的内存量。free命令的输出可以帮助你了解系统的内存管理机制，以及如何优化内存的使用。 其实 free 命令中的信息都来自于 /proc/meminfo 文件。 /proc/meminfo 文件包含了更多更原始的信息，只是显示不太直观。
 
-###  语法 
+## Linux free命令适用的Linux版本
 
-```shell
-free(选项)
+free命令是一个通用的Linux命令，它可以在大多数的Linux发行版中使用，包括Ubuntu, Debian, Fedora, CentOS, Red Hat, SUSE, Arch等。 如果你的系统没有安装free命令，你可以使用以下命令来安装它：
+
+- 对于基于Debian的系统，如Ubuntu，你可以使用apt命令：
+
+```bash
+$ sudo apt update
+$ sudo apt install procps
 ```
 
-###  选项 
+- 对于基于Red Hat的系统，如CentOS，你可以使用yum或dnf命令：
 
-```shell
--b # 以Byte为单位显示内存使用情况；
--k # 以KB为单位显示内存使用情况；
--m # 以MB为单位显示内存使用情况；
--g # 以GB为单位显示内存使用情况。 
--o # 不显示缓冲区调节列；
--s<间隔秒数> # 持续观察内存使用状况；
--t # 显示内存总和列；
--V # 显示版本信息。
+```bash
+$ sudo yum install procps-ng
 ```
 
-###  实例 
+或者
 
-```shell
-free -t    # 以总和的形式显示内存的使用信息
-free -s 10 # 周期性的查询内存使用信息，每10s 执行一次命令
+```bash
+$ sudo dnf install procps-ng
 ```
 
-显示内存使用情况
+free 命令是 procps 或 procps-ng 软件包的一部分，这些软件包提供了一些用于监控系统资源和进程的命令，如 ps, top, vmstat 等。
+
+##  命令语法 
 
 ```shell
-free -m
-             total       used       free     shared    buffers     cached
-Mem:          2016       1973         42          0        163       1497
--/+ buffers/cache:        312       1703
-Swap:         4094          0       4094
+free [options]
 ```
 
- **第一部分Mem行解释：** 
+options 说明：
+
+- -b, --bytes: 以字节为单位显示内存。
+- -k, --kilo: 以千字节为单位显示内存（默认）。
+- -m, --mega: 以兆字节为单位显示内存。
+- -g, --giga: 以吉字节为单位显示内存。
+- —tera: 以太字节为单位显示内存。
+- -h, --human: 自动调整显示单位为最短的三位数，并显示单位。使用的单位有B（字节），K（千字节），M（兆字节），G（吉字节），T（太字节）。
+- -c, --count: 循环显示c次输出，与-s选项一起使用。
+- -l, --lohi: 显示详细的低内存和高内存统计信息。
+- -o, --old: 禁用显示缓冲调整后的行。
+- -s, --seconds: 每隔s秒连续显示输出，s可以是小数。
+- -t, --total: 在输出中添加一行显示列的总计。
+- --help: 显示帮助信息并退出。
+- -V, --version: 显示版本信息并退出。
+
+##  实例 
+
+### 不带任何选项的free命令，以千字节为单位显示内存使用情况
 
 ```shell
-total：内存总数；
-used：已经使用的内存数；
-free：空闲的内存数；
-shared：当前已经废弃不用；
-buffers Buffer：缓存内存数；
-cached Page：缓存内存数。
+$ free
+              total        used        free      shared  buff/cache   available
+Mem:        8048372     2593004     1366712      658380     4088656     4494976
+Swap:             0           0           0
 ```
 
-关系：total = used + free
+**第一行Mem：** 
 
- **第二部分(-/+ buffers/cache)解释:** 
+* total 系统总的可用物理内存大小
+* used 已被使用的物理内存大小
+* free 还有多少物理内存可用，是真正尚未被使用的物理内存数量。
+* shared 被共享使用的物理内存大小
+* buff/cache 被 buffer 和 cache 使用的物理内存大小
+* available 还可以被应用程序使用的物理内存大小。这是从应用程序的角度看到的可用内存，一般来说 `available = free + buffer + cache`。
 
-```shell
-(-buffers/cache) used内存数：第一部分Mem行中的 used – buffers – cached
-(+buffers/cache) free内存数: 第一部分Mem行中的 free + buffers + cached
+**第二行Swap**：交换分区，也就是我们通常所说的虚拟内存。当系统物理内存吃紧时，Linux 会将内存中不常访问的数据保存到 Swap 区上。内核提供了一个叫做 `swappiness` 的参数，用于配置需要将内存中不常用的数据移到 Swap 中的紧迫程度。数值越小表示尽量不要使用 Swap 。
+
+> buffers 和 cached 都是缓存，两者有什么区别呢？
+>
+> 磁盘的操作有逻辑级（文件系统）和物理级（磁盘块）两种方式。为了提高磁盘存取效率，Linux 采取了两种Cache 方式： Page Cache 和 Buffer Cache，分别针对逻辑和物理数据进行缓存。
+>
+> * Page Cache 是针对文件系统 inode 的缓存，在文件层面上的数据会缓存到 page cache。文件的逻辑层需要映射到实际的物理磁盘，这种映射关系由文件系统来完成。当 page cache 的数据需要刷新时，page cache 中的数据交给 buffer cache，因为Buffer Cache就是缓存磁盘块的。但是这种处理在2.6版本的内核之后就变的很简单了，没有真正意义上的 cache 操作。
+> * Buffer Cache 是针对磁盘块的缓存，也就是在没有文件系统的情况下，直接对磁盘进行操作的数据会缓存到 buffer cache 中，例如，文件系统的元数据都会缓存到 buffer cache 中。
+>
+> 所以 Linux 系统只要不用 Swap 的交换空间，就不用担心自己的内存太少。一般情况下，少量地使用 Swap 也是不影响系统性能的。如果常常 Swap 用很多，可能你就要考虑加物理内存了，这也是 Linux 看内存是否够用的标准。
+>
+
+### 使用-h选项的free命令，以人类可读的格式显示内存使用情况
+
+```bash
+$ free -h
+              total        used        free      shared  buff/cache   available
+Mem:          7.7Gi       2.5Gi       1.3Gi       643Mi       3.9Gi       4.3Gi
+Swap:            0B          0B          0B
 ```
 
-可见-buffers/cache反映的是被程序实实在在吃掉的内存，而+buffers/cache反映的是可以挪用的内存总数。
+### 使用-t选项的free命令，显示内存和交换空间的总计
 
-第三部分是指交换分区。
-
-输出结果的第四行是交换分区SWAP的，也就是我们通常所说的虚拟内存。
-区别：第二行(mem)的used/free与第三行(-/+ buffers/cache) used/free的区别。 这两个的区别在于使用的角度来看，第一行是从OS的角度来看，因为对于OS，buffers/cached 都是属于被使用，所以他的可用内存是2098428KB,已用内存是30841684KB,其中包括，内核（OS）使用+Application(X, oracle,etc)使用的+buffers+cached.
-
-第三行所指的是从应用程序角度来看，对于应用程序来说，buffers/cached 是等于可用的，因为buffer/cached是为了提高文件读取的性能，当应用程序需在用到内存的时候，buffer/cached会很快地被回收。
-
-所以从应用程序的角度来说，可用内存=系统free memory+buffers+cached。
-如本机情况的可用内存为：
-
-18007156=2098428KB+4545340KB+11363424KB
-
-接下来解释什么时候内存会被交换，以及按什么方交换。 
-
-当可用内存少于额定值的时候，就会开会进行交换。如何看额定值：
-
-```shell
-cat /proc/meminfo
-
-MemTotal:       16140816 kB
-MemFree:          816004 kB
-MemAvailable:    2913824 kB
-Buffers:           17912 kB
-Cached:          2239076 kB
-SwapCached:            0 kB
-Active:         12774804 kB
-Inactive:        1594328 kB
-Active(anon):   12085544 kB
-Inactive(anon):    94572 kB
-Active(file):     689260 kB
-Inactive(file):  1499756 kB
-Unevictable:      116888 kB
-Mlocked:          116888 kB
-SwapTotal:       8191996 kB
-SwapFree:        8191996 kB
-Dirty:                56 kB
-Writeback:             0 kB
-AnonPages:      12229228 kB
-Mapped:           117136 kB
-Shmem:             58736 kB
-Slab:             395568 kB
-SReclaimable:     246700 kB
-SUnreclaim:       148868 kB
-KernelStack:       30496 kB
-PageTables:       165104 kB
-NFS_Unstable:          0 kB
-Bounce:                0 kB
-WritebackTmp:          0 kB
-CommitLimit:    16262404 kB
-Committed_AS:   27698600 kB
-VmallocTotal:   34359738367 kB
-VmallocUsed:      311072 kB
-VmallocChunk:   34350899200 kB
-HardwareCorrupted:     0 kB
-AnonHugePages:   3104768 kB
-HugePages_Total:       0
-HugePages_Free:        0
-HugePages_Rsvd:        0
-HugePages_Surp:        0
-Hugepagesize:       2048 kB
-DirectMap4k:      225536 kB
-DirectMap2M:    13279232 kB
-DirectMap1G:     5242880 kB
+```bash
+$ free -t
+              total        used        free      shared  buff/cache   available
+Mem:        8048372     2593004     1366712      658380     4088656     4494976
+Swap:             0           0           0
+Total:      8048372     2593004     1366712
 ```
 
-交换将通过三个途径来减少系统中使用的物理页面的个数：　
- 
-1. 减少缓冲与页面cache的大小， 
-2. 将系统V类型的内存页面交换出去，　 
-3. 换出或者丢弃页面。(Application 占用的内存页，也就是物理内存不足）。 
+### 使用-s选项的free命令，每隔2秒显示一次内存使用情况，直到按下Ctrl+C停止
 
-事实上，少量地使用swap是不是影响到系统性能的。
+```bash
+$ free -s 2
+              total        used        free      shared  buff/cache   available
+Mem:        8048372     2593004     1366712      658380     4088656     4494976
+Swap:             0           0           0
+              total        used        free      shared  buff/cache   available
+Mem:        8048372     2593004     1366712      658380     4088656     4494976
+Swap:             0           0           0
+              total        used        free      shared  buff/cache   available
+Mem:        8048372     2593004     1366712      658380     4088656     4494976
+Swap:             0           0           0
+^C
+```
 
-那buffers和cached都是缓存，两者有什么区别呢？
+### 使用-l选项的free命令，显示低内存和高内存的统计信息
 
-为了提高磁盘存取效率, Linux做了一些精心的设计, 除了对dentry进行缓存(用于VFS,加速文件路径名到inode的转换), 还采取了两种主要Cache方式：
+```
+[linux@bashcommandnotfound.cn ~]$ free -l
+              total        used        free      shared  buff/cache   available
+Mem:        8048372     2593004     1366712      658380     4088656     4494976
+Low:        8048372     2593004     1366712
+High:             0           0           0
+Swap:             0           0           0
+```
 
-Buffer Cache和Page Cache。前者针对磁盘块的读写，后者针对文件inode的读写。这些Cache有效缩短了 I/O系统调用(比如read,write,getdents)的时间。
-磁盘的操作有逻辑级（文件系统）和物理级（磁盘块），这两种Cache就是分别缓存逻辑和物理级数据的。
+## Linux free命令的注意事项
 
-Page cache实际上是针对文件系统的，是文件的缓存，在文件层面上的数据会缓存到page cache。文件的逻辑层需要映射到实际的物理磁盘，这种映射关系由文件系统来完成。当page cache的数据需要刷新时，page cache中的数据交给buffer cache，因为Buffer Cache就是缓存磁盘块的。但是这种处理在2.6版本的内核之后就变的很简单了，没有真正意义上的cache操作。
+- free命令的输出可能会随着系统的运行而变化，因为内核会根据需要动态地分配和回收内存。
+- free命令的输出中，空闲的内存（free）并不代表系统可以使用的内存，因为缓冲和缓存的内存也可以被回收。因此，可用的内存（available）是一个更准确的指标，它表示系统可以分配给应用程序的内存量，而不会导致交换。
+- free命令的输出中，共享的内存（shared）是指由tmpfs文件系统使用的内存，它是一种基于内存的文件系统，用于存储临时文件，如/run, /dev/shm等。
+- free命令的输出中，缓冲和缓存的内存（buff/cache）是指由内核用于提高系统性能的内存。缓冲（buffers）是指用于存储磁盘块的内存，缓存（cache）是指用于存储文件系统元数据和文件内容的内存。
+- 如果你想要释放缓冲和缓存的内存，你可以使用以下命令，但是这并不会提高系统的性能，反而可能会降低，因为内核会重新分配缓冲和缓存的内存：
 
-Buffer cache是针对磁盘块的缓存，也就是在没有文件系统的情况下，直接对磁盘进行操作的数据会缓存到buffer cache中，例如，文件系统的元数据都会缓存到buffer cache中。
+```bash
+$ sudo sync
+$ sudo echo 3 > /proc/sys/vm/drop_caches
+```
 
-简单说来，page cache用来缓存文件数据，buffer cache用来缓存磁盘数据。在有文件系统的情况下，对文件操作，那么数据会缓存到page cache，如果直接采用dd等工具对磁盘进行读写，那么数据会缓存到buffer cache。
+- 如果你想要查看内存的详细信息，你可以使用以下命令，它们会显示更多的内存相关的参数和统计数据：
 
-所以我们看linux,只要不用swap的交换空间,就不用担心自己的内存太少.如果常常swap用很多,可能你就要考虑加物理内存了.这也是linux看内存是否够用的标准.
-
-如果是应用服务器的话，一般只看第二行，+buffers/cache,即对应用程序来说free的内存太少了，也是该考虑优化程序或加内存了。
-
-
+```bash
+$ cat /proc/meminfo
+$ vmstat -s
+```
 

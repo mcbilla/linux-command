@@ -1,10 +1,9 @@
+import * as ejs from 'ejs';
 import FS from 'fs-extra';
+import { create } from 'markdown-to-html-cli';
 import path from 'path';
 import stylus from 'stylus';
-import * as ejs from 'ejs';
 import UglifyJS from 'uglify-js';
-import { create } from 'markdown-to-html-cli';
-import _ from 'colors-cli/toxic';
 
 const deployDir = path.resolve(process.cwd(), '.deploy');
 const faviconPath = path.resolve(process.cwd(), 'template', 'img', 'favicon.ico');
@@ -146,6 +145,7 @@ const contributorsPath = path.resolve(process.cwd(), 'CONTRIBUTORS.svg');
       const commandData = {};
       const indexes = [];
       pathArr.forEach((mdPath, i) => {
+        console.log('当前处理文件: ' + mdPath);
         const json = {}
         const con = FS.readFileSync(mdPath);
         const str = con.toString();

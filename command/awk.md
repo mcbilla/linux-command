@@ -5,75 +5,197 @@ awk
 
 ## 补充说明
 
-**awk** 是一种编程语言，用于在linux/unix下对文本和数据进行处理。数据可以来自标准输入(stdin)、一个或多个文件，或其它命令的输出。它支持用户自定义函数和动态正则表达式等先进功能，是linux/unix下的一个强大编程工具。它在命令行中使用，但更多是作为脚本来使用。awk有很多内建的功能，比如数组、函数等，这是它和C语言的相同之处，灵活性是awk最大的优势。
+**awk** 是一种编程语言，用于在 linux/unix 下对文本和数据进行处理。数据可以来自标准输入(stdin)、一个或多个文件，或其它命令的输出。它支持用户自定义函数和动态正则表达式等先进功能，是 linux/unix 下的一个强大编程工具。它在命令行中使用，但更多是作为脚本来使用。awk 有很多内建的功能，比如数组、函数等，这是它和 C 语言的相同之处，灵活性是 awk 最大的优势。
 
-## awk命令格式和选项  
+awk 是逐行处理文本的，逐行处理的意思就是说，当 awk 处理一个文本时，会一行一行进行处理，处理完当前行，再处理下一行，awk 默认以”换行符”为标记。每次遇到”回车换行”，就认为是当前行的结束，新的一行的开始，awk 会按照用户指定的分割符去分割当前行，如果没有指定分割符，默认使用空格作为分隔符。
 
-**语法形式** 
+推荐一个适合新手的入门教程系列 [这里](https://www.zsythink.net/archives/tag/awk/)
+
+## 命令语法
 
 ```shell
-awk [options] 'script' var=value file(s)
-awk [options] -f scriptfile var=value file(s)
+awk [options] 'pattern{action}' filename
 ```
 
-**常用命令选项** 
+awk 的参数由三部分组成：
 
-*  **-F fs** fs指定输入分隔符，fs可以是字符串或正则表达式，如-F:，默认的分隔符是连续的空格或制表符
-*  **-v var=value** 赋值一个用户定义变量，将外部变量传递给awk
-*  **-f scripfile** 从脚本文件中读取awk命令
-*  **-m[fr] val** 对val值设置内在限制，-mf选项限制分配给val的最大块数目；-mr选项限制记录的最大数目。这两个功能是Bell实验室版awk的扩展功能，在标准awk中不适用。
+- options：参数选项。
+- pattern：模式，类似于筛选条件的作用，要满足 pattern 格式的文本才会进行后续的 action 处理。
+- action：动作，对文本进行具体的格式化处理。
 
-## awk模式和操作  
+### 选项（options）
 
-awk脚本是由模式和操作组成的。
+```
+-F fs	指定输入字段分隔符为fs，默认为空格或制表符
+-v var=value	赋值一个用户自定义变量var，并设置其值为value
+-f file	从file中读取awk脚本
+-m[fr] val	设置内存限制为val，f表示记录数，r表示记录大小
+-W option	指定兼容模式或警告级别，option可以是posix, gnu, traditional, old, warn, nowarn等
+```
 
-###  模式 
+###  模式（pattern）
 
-模式可以是以下任意一个：
+pattern 也称为条件，当 awk 进行逐行处理的时候，会把 pattern（模式）作为条件，判断将要被处理的行是否满足条件，是否能跟”模式”进行匹配，如果匹配，则处理，如果不匹配，则不进行处理。
 
-* /正则表达式/：使用通配符的扩展集。
-* 关系表达式：使用运算符进行操作，可以是字符串或数字的比较测试。
-* 模式匹配表达式：用运算符`~`（匹配）和`!~`（不匹配）。
-* BEGIN语句块、pattern语句块、END语句块：参见awk的工作原理
+* 空模式：pattern 为空，即对所有行都进行处理，默认模式。
 
-###  操作 
+  ```shell
+  awk '{action}' filename
+  ```
 
-操作由一个或多个命令、函数、表达式组成，之间由换行符或分号隔开，并位于大括号内，主要部分是：
+* 正则模式：使用/正则表达式/作为匹配模式。
+
+  ```shell
+  awk '/regexp/{action}' filename
+  ```
+
+* 行范围模式：正则模式的范围版本，对匹配到第一个正则表达式，到匹配到第二个正则表达式中间的文本进行处理。
+
+  ```shell
+  awk '/regexp1/,/regexp2/{action}' filename
+  ```
+
+* 关系表达式模式：使用运算符进行操作，可以是字符串或数字的比较测试。如果有多个关系表达式，可以通过&&进行关联。
+
+  ```shell
+  awk 'NF>2 {action}' filename
+  awk 'NF>2 && NF<5 {action}' filename
+  ```
+
+* BEGIN/END模式：特殊模式，BEGIN 模式在 awk 读取任何输入行之前执行，END 模式在 awk 处理完所有输入行后执行。
+
+  ```shell
+  $ awk '
+  BEGIN { action }
+  /pattern/ { action }
+  /pattern/ { action }
+  ………
+  END { action }
+  ' filename
+  ```
+
+###  动作（action）
+
+动作是对文本进行具体解析操作的步骤，由一个或多个命令、函数、表达式组成，之间由换行符或分号隔开，并位于大括号 `{}` 内。其中 `{}` 块内部可以组合多个 `{}` 块。例如
+
+```shell
+# 外层{}组合内层的两个{}
+awk '{print $1}{print $2}' test.txt
+
+# 也可以写在同一个{}里面，用;隔开
+awk '{print $1; print $2}' test.txt
+```
+
+常用的动作分类有：
+
+* 输出命令：`print、printf`，注意打印多个变量的时候，如果使用逗号 `,` 隔开，输出文本会空格隔开；如果使用空格隔开，输出文本默认连起来。
+
+  ```shell
+  awk '{print $0}' test.txt
+  
+  # 逗号隔开，输出1 2 3
+  awk '{print $1, $2, $3}' test.txt
+  
+  # 空格隔开，输出123
+  awk '{print $1 $2 $3}' test.txt
+  
+  # 格式化
+  awk '{printf "%s\\t%s\\n", $1, $2}' test.txt
+  ```
+
+* 控制流语句：`if`、`if...else...`、`if...else if...else...`。当 `if` 中只有一条语句的时候，`{}` 可以省略。
+
+  ```shell
+  awk 'if(NR == 1){print $0}' test.txt
+  
+  awk 'if(NR == 1){print $1}else{print $2}' test.txt
+  
+  awk 'if(NR == 1){print $1}else if(NR == 2){print t$2}else{print $3}' test.txt
+  ```
 
 * 变量或数组赋值
-* 输出命令
 * 内置函数
-* 控制流语句
 
-## awk脚本基本结构  
+## 示例
 
-```shell
-awk 'BEGIN{ print "start" } pattern{ commands } END{ print "end" }' file
+### 1、指定分隔符
+
+```bash
+cat /etc/passwd |awk -F ':' '{print $1}'
 ```
 
-一个awk脚本通常由：BEGIN语句块、能够使用模式匹配的通用语句块、END语句块3部分组成，这三个部分是可选的。任意一个部分都可以不出现在脚本中，脚本通常是被 **单引号** 中，例如：
+### 2、格式化
 
-```shell
-awk 'BEGIN{ i=0 } { i++ } END{ print i }' filename
+```bash
+cat /etc/passwd | awk -F ':' '{printf "%s\\\\t%s\\\\n", $1, $7}'
 ```
 
-###  awk的工作原理 
+### 3、使用BEGIN/END模式
+
+```bash
+cat /etc/passwd |awk  -F ':' 'BEGIN{print "name,shell"} {print $1","$7} END{print "blue,/bin/nosh"}'
+```
+
+### 4、使用内置变量
+
+```bash
+# 打印行号和行字段数
+cat /etc/passwd |awk  -F ':' '{print NR, NF, $0}'
+```
+
+### 5、条件查找
+
+```bash
+# 查找第四列小于100的所有行
+cat /etc/passwd |awk -F ':' 'if($3<100){print $0}'
+
+# 也可以省略if
+cat /etc/passwd |awk -F ':' '$3<100{print $0}'
+```
+
+### 6、三元操作符
+
+```bash
+cat /etc/passwd |awk -F ':' '{usertype=$3&lt;500?"系统用户":"普通用户"; print $1, $3, usertype}'
+```
+
+### 7、打印奇偶行
+
+```bash
+# 打印奇数行
+cat /etc/passwd |awk -F ':' 'i=!i'
+# 可以通过下面验证
+cat /etc/passwd |awk -F ':' 'i=!i{print NR, i, $0}'
+
+# 打印偶数行
+cat /etc/passwd |awk -F ':' '!(i=!i)'
+# 可以通过下面验证
+cat /etc/passwd |awk -F ':' '!(i=!i){print NR, i, $0}'
+```
+
+参考 [awk从放弃到入门（11）：拾遗之”三元运算”与”打印奇偶行”](https://www.zsythink.net/archives/2159)
+
+### 8、使用数组统计出现次数
+
+```bash
+awk '{count[$1]++} END{for(i in count){print i, count[i]}}'
+```
+
+## awk的BEGIN/END模式
+
+awk 的 BEGIN/END 模式由：BEGIN语句块、pattern、END语句块三部分组成，这三个部分是可选的。任意一个部分都可以不出现在脚本中。
 
 ```shell
 awk 'BEGIN{ commands } pattern{ commands } END{ commands }'
 ```
 
-*   第一步：执行`BEGIN{ commands }`语句块中的语句；
-*   第二步：从文件或标准输入(stdin)读取一行，然后执行`pattern{ commands }`语句块，它逐行扫描文件，从第一行到最后一行重复这个过程，直到文件全部被读取完毕。
-*   第三步：当读至输入流末尾时，执行`END{ commands }`语句块。
+* **BEGIN语句块**：在 awk 开始从输入流中读取行之前被执行，比如执行变量初始化、打印输出表格的表头等。
 
- **BEGIN语句块** 在awk开始从输入流中读取行 **之前** 被执行，这是一个可选的语句块，比如变量初始化、打印输出表格的表头等语句通常可以写在BEGIN语句块中。
+* **pattern语句块**：通用命令是最重要的部分，awk 读取的每一行都会执行该语句块。这部分也是可选的，如果没有提供 pattern 语句块，则默认执行`{ print }`，即打印每一个读取到的行。
 
- **END语句块** 在awk从输入流中读取完所有的行 **之后** 即被执行，比如打印所有行的分析结果这类信息汇总都是在END语句块中完成，它也是一个可选语句块。
+* **END语句块**：在 awk 从输入流中读取完所有的行之后即被执行，比如打印所有行的分析结果这类信息汇总等。 
 
- **pattern语句块** 中的通用命令是最重要的部分，它也是可选的。如果没有提供pattern语句块，则默认执行`{ print }`，即打印每一个读取到的行，awk读取的每一行都会执行该语句块。
-
- **示例** 
+ 例如：
 
 ```shell
 echo -e "A line 1\nA line 2" | awk 'BEGIN{ print "Start" } { print } END{ print "End" }'
@@ -83,50 +205,24 @@ A line 2
 End
 ```
 
-当使用不带参数的`print`时，它就打印当前行，当`print`的参数是以逗号进行分隔时，打印时则以空格作为定界符。在awk的print语句块中双引号是被当作拼接符使用，例如：
+## awk的变量 
 
-```shell
-echo | awk '{ var1="v1"; var2="v2"; var3="v3"; print var1,var2,var3; }' 
-v1 v2 v3
-```
+### 内置变量（预定义变量）
 
-双引号拼接使用：
+awk 有许多内置变量用来设置环境信息，其中`$+数字`是特殊的内置变量，`$0`表示当前行，`$1`、`$2`、`$3`依次表示当前行的第一列，第二列，第三列以此类推。
 
-```shell
-echo | awk '{ var1="v1"; var2="v2"; var3="v3"; print var1"="var2"="var3; }'
-v1=v2=v3
-```
+除了 `$+数字` 变量之外，其他的内置变量使用时前面不需要加 `$`。常用的内置变量有：
 
-{ }类似一个循环体，会对文件中的每一行进行迭代，通常变量初始化语句（如：i=0）以及打印文件头部的语句放入BEGIN语句块中，将打印的结果等语句放在END语句块中。
-
-## awk内置变量（预定义变量）  
-
-说明：[A][N][P][G]表示第一个支持变量的工具，[A]=awk、[N]=nawk、[P]=POSIXawk、[G]=gawk
-
-```shell
- **$n**  当前记录的第n个字段，比如n为1表示第一个字段，n为2表示第二个字段。 
- **$0**  这个变量包含执行过程中当前行的文本内容。
-[N]  **ARGC**  命令行参数的数目。
-[G]  **ARGIND**  命令行中当前文件的位置（从0开始算）。
-[N]  **ARGV**  包含命令行参数的数组。
-[G]  **CONVFMT**  数字转换格式（默认值为%.6g）。
-[P]  **ENVIRON**  环境变量关联数组。
-[N]  **ERRNO**  最后一个系统错误的描述。
-[G]  **FIELDWIDTHS**  字段宽度列表（用空格键分隔）。
-[A]  **FILENAME**  当前输入文件的名。
-[P]  **FNR**  同NR，但相对于当前文件。
-[A]  **FS**  字段分隔符（默认是任何空格）。
-[G]  **IGNORECASE**  如果为真，则进行忽略大小写的匹配。
-[A]  **NF**  表示字段数，在执行过程中对应于当前的字段数。
-[A]  **NR**  表示记录数，在执行过程中对应于当前的行号。
-[A]  **OFMT**  数字的输出格式（默认值是%.6g）。
-[A]  **OFS**  输出字段分隔符（默认值是一个空格）。
-[A]  **ORS**  输出记录分隔符（默认值是一个换行符）。
-[A]  **RS**  记录分隔符（默认是一个换行符）。
-[N]  **RSTART**  由match函数所匹配的字符串的第一个位置。
-[N]  **RLENGTH**  由match函数所匹配的字符串的长度。
-[N]  **SUBSEP**  数组下标分隔符（默认值是34）。
-```
+- FS：输入字段分隔符， 默认为空白字符
+- OFS：输出字段分隔符， 默认为空白字符
+- RS：输入记录分隔符(输入换行符)， 指定输入时的换行符
+- ORS：输出记录分隔符（输出换行符），输出时用指定符号代替换行符
+- NF：number of Field，当前行的字段的个数(即当前行被分割成了几列)，字段数量
+- NR：行号，当前处理的文本行的行号。
+- FNR：各文件分别计数的行号
+- FILENAME：当前文件名
+- ARGC：命令行参数的个数
+- ARGV：数组，保存的是命令行所给定的各参数
 
 转义序列
 
@@ -176,7 +272,7 @@ awk '{ print $2,$3 }' filename
 awk 'END{ print NR }' filename
 ```
 
-以上命令只使用了END语句块，在读入每一行的时，awk会将NR更新为对应的行号，当到达最后一行NR的值就是最后一行的行号，所以END语句块中的NR就是文件的行数。
+以上命令只使用了END语句块，在读入每一行的时，awk 会将 NR 更新为对应的行号，当到达最后一行 NR 的值就是最后一行的行号，所以END语句块中的NR就是文件的行数。
 
 一个每一行中第一个字段值累加的例子：
 
@@ -192,38 +288,23 @@ seq 5 | awk 'BEGIN{ sum=0; print "总和：" } { print $1"+"; sum+=$1 } END{ pri
 15
 ```
 
-## 将外部变量值传递给awk  
+### 自定义变量
 
-借助 **`-v`选项** ，可以将外部值（并非来自stdin）传递给awk：
+用户自定义的变量，有两种方法可以自定义变量。
 
-```shell
-VAR=10000
-echo | awk -v VARIABLE=$VAR '{ print VARIABLE }'
-```
-
-另一种传递外部变量方法：
+* 使用 `-v name=value` 把变量值传递给awk：
 
 ```shell
-var1="aaa"
-var2="bbb"
-echo | awk '{ print v1,v2 }' v1=$var1 v2=$var2
+awk -v myVar="testVar" 'BEGIN{print myVar}'
 ```
 
-当输入来自于文件时使用：
+* 在命令中直接定义，注意变量定义与动作之间需要用分号 `;` 隔开。
 
 ```shell
-awk '{ print v1,v2 }' v1=$var1 v2=$var2 filename
+awk 'BEGIN{myVar="testVar"; print myVar}
 ```
 
-以上方法中，变量之间用空格分隔作为awk的命令行参数跟随在BEGIN、{}和END语句块之后。
-
-## 查找进程pid
-
-```shell
-netstat -antup | grep 7770 | awk '{ print $NF NR}' | awk '{ print $1}'
-```
-
-## awk运算与判断  
+## awk的运算与判断  
 
 作为一种程序设计语言所应具有的特点之一，awk支持多种运算，这些运算与C语言提供的基本相同。awk还提供了一系列内置的运算函数（如log、sqr、cos、sin等）和一些用于对字符串进行操作（运算）的函数（如length、substr等等）。这些函数的引用大大的提高了awk的运算功能。作为对条件转移指令的一部分，关系判断是每种程序设计语言都具备的功能，awk也不例外，awk中允许进行多种测试，作为样式匹配，还提供了模式匹配表达式~（匹配）和!~（不匹配）。作为对测试的一种扩充，awk也支持用逻辑运算符。
 
@@ -340,17 +421,12 @@ awk 'BEGIN{a="b";arr[0]="b";arr[1]="c";print (a in arr);}'
 0
 ```
 
-```
+```shell
 awk 'BEGIN{a="b";arr[0]="b";arr["b"]="c";print (a in arr);}'
 1
 ```
 
-###  运算级优先级表 
-
-!级别越高越优先  
-级别越高越优先
-
-## awk高级输入输出  
+## awk的高级输入输出  
 
 ###  读取下一条记录 
 
@@ -459,7 +535,7 @@ awk 'BEGIN{ FS=":" } { print $NF }' /etc/passwd
 
 在`BEGIN语句块`中则可以用`OFS=“定界符”`设置输出字段的定界符。
 
-## 流程控制语句  
+## awk的流程控制语句  
 
 在linux awk的while、do-while和for语句中允许使用break,continue语句来控制流程走向，也允许使用exit这样的语句来退出。break中断当前正在执行的循环并跳到循环外执行下一条语句。if 是流程选择用法。awk中，流程控制语句，语法结构，与c语言类型。有了这些语句，其实很多shell程序都可以交给awk，而且性能是非常快的。下面是各个语句用法。
 
@@ -506,7 +582,7 @@ very good
 
 ###  循环语句 
 
-### # while语句 
+#### while循环
 
 ```shell
 while(表达式)
@@ -528,7 +604,7 @@ print total;
 5050
 ```
 
-### # for循环 
+#### for循环 
 
 for循环有两种格式：
 
@@ -580,7 +656,7 @@ print total;
 5050
 ```
 
-### # do循环 
+#### do循环 
 
 ```shell
 do
@@ -606,35 +682,44 @@ do {total+=i;i++;} while(i<=100)
 * **next**  能能够导致读入下一个输入行，并返回到脚本的顶部。这可以避免对当前输入行执行其他的操作过程。
 * **exit**  语句使主输入循环退出并将控制转移到END,如果END存在的话。如果没有定义END规则，或在END中应用exit语句，则终止脚本的执行。
 
-## 数组应用  
+## awk的数组  
 
-数组是awk的灵魂，处理文本中最不能少的就是它的数组处理。因为数组索引（下标）可以是数字和字符串在awk中数组叫做关联数组(associative arrays)。awk 中的数组不必提前声明，也不必声明大小。数组元素用0或空字符串来初始化，这根据上下文而定。
+数组是 awk 的灵魂，处理文本中最不能少的就是它的数组处理。awk 中的数组使用：
 
-###  数组的定义 
+* awk 中的数组元素的下标默认从 1 开始。
 
-数字做数组索引（下标）：
+* awk 中的数组不必提前声明，也不必声明大小，直接为数组元素赋值即可。
 
-```shell
-Array[1]="sun"
-Array[2]="kai"
-```
+  ```shell
+  # 输出大娃
+  awk 'BEGIN{huluwa[1]="大娃"; huluwa[2]="二娃"; huluwa[3]="三娃"; print huluwa[1]}'
+  ```
 
-字符串做数组索引（下标）：
+* 数组元素用 0 或空字符串来初始化，这根据上下文而定。所以不能根据元素的值是否为”空”去判断元素是否存在。
 
-```shell
-Array["first"]="www"
-Array["last"]="name"
-Array["birth"]="1987"
-```
+  ```shell
+  # huluwa[4]设置为空，输出空串
+  awk 'BEGIN{huluwa[1]="大娃"; huluwa[2]="二娃"; huluwa[3]="三娃"; huluwa[4]=""; print huluwa[4]}'
+  
+  # 没有设置元素huluwa[5]，但是会输出空串
+  awk 'BEGIN{huluwa[1]="大娃"; huluwa[2]="二娃"; huluwa[3]="三娃"; huluwa[4]=""; print huluwa[5]}'
+  
+  # 判断对应下标的元素是否存在
+  awk 'BEGIN{huluwa[1]="大娃"; huluwa[2]="二娃"; huluwa[3]="三娃"; huluwa[4]=""; if(5 in huluwa){print huluwa[5]}}'
+  
+  # 还可以使用!取反
+  awk 'BEGIN{huluwa[1]="大娃"; huluwa[2]="二娃"; huluwa[3]="三娃"; huluwa[4]=""; if(!(5 in huluwa)){print huluwa[5]}}'
+  ```
 
-使用中`print Array[1]`会打印出sun；使用`print Array[2]`会打印出kai；使用`print["birth"]`会得到1987。
+* awk中数组的下标不仅可以为”数字”，还可以为”任意字符串”。事实上 awk 数组的本质是关联数组，默认会把”数字”下标转换为”字符串”。
 
- **读取数组的值** 
-
-```shell
-{ for(item in array) {print array[item]}; }       #输出的顺序是随机的
-{ for(i=1;i<=len;i++) {print array[i]}; }         #Len是数组的长度
-```
+  ```shell
+  # 输出二娃
+  awk 'BEGIN{huluwa[yiwa]="大娃"; huluwa[erwa]="二娃"; huluwa[sanwa]="三娃"; huluwa[siwa]=""; {print huluwa[erwa]}}'
+  
+  # 对于“字符串”下标的数组，可以通过foreach循环输出，注意输出顺序和赋值顺序不一定相同
+  awk 'BEGIN{huluwa[yiwa]="大娃"; huluwa[erwa]="二娃"; huluwa[sanwa]="三娃"; huluwa[siwa]=""; for(i in huluwa){print huluwa[i]}}'
+  ```
 
 ###  数组相关函数 
 
@@ -750,7 +835,7 @@ for(m in tarr){
 }'
 ```
 
-## 内置函数  
+## awk的内置函数  
 
 awk内置函数，主要分以下3种类似：算数函数、字符串函数、其它一般函数、时间函数。
 
@@ -977,5 +1062,4 @@ awk 'BEGIN{tstamp1=mktime("2001 01 01 12 12 12");tstamp2=systime();print tstamp2
 | %y | 两位数字表示的年(99) |
 | %Y | 当前月份 |
 | %% | 百分号(%) |
-
 
