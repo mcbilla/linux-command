@@ -19,7 +19,7 @@ mount 命令可以手动执行，也可以通过配置 `/etc/fstab`文件来自�
 
 mount 命令还可以用来查询当前已挂载的文件系统或设备的信息，例如类型、选项、大小等。这些信息可以帮助你了解系统的磁盘使用情况和性能。
 
-## Linux mount命令适用的Linux版本
+## 适用的Linux版本
 
 mount 命令是一个通用的 Linux 命令，它可以在多数 Linux 发行版（如Debian、Ubuntu、Alpine、Arch Linux、Kali Linux、RedHat/CentOS、Fedora、Raspbian）的主要终端命令解释器（包括bash、zsh、csh、ksh、fish、tcsh）中使用。不同的Linux发行版可能支持不同的文件系统类型，例如ext4、xfs、btrfs等。你可以使用-t选项来指定要挂载的文件系统类型，也可以省略这个选项，让 mount 命令自动检测文件系统类型。
 

@@ -7,7 +7,7 @@ fsck
 
 `fsck`，全称File System Consistency Check，主要用于检查和修复Linux文件系统的不一致和错误。该工具用于解决潜在的文件系统问题。`fsck`可以为你提供检查和修复一切文件系统中的问题的功能，包括一些潜在的磁盘错误等。
 
-## Linux fsck命令适用的Linux版本
+## 适用的Linux版本
 
 `fsck`命令在所有主流的Linux发行版，如Debian、Ubuntu、Alpine、Arch Linux、Kali Linux、RedHat/CentOS、Fedora、Raspbian等上都是默认安装的，属于Linux系统中的基础命令，无需另行安装。
 
@@ -39,7 +39,7 @@ fsck [options] [filesystem ...]
 
 `options` 是fsck命令的选项，`filesystem` 是需要检查和修复的文件系统挂载点或设备名。
 
-## Linux fsck命令的常用选项或参数说明
+## 常用选项
 
 下表列出了`fsck`命令的常用选项：
 
@@ -60,7 +60,7 @@ fsck [options] [filesystem ...]
 | -y       | 尝试在检查期间自动修复文件系统错误。                         |
 | -V       | 详细输出。                                                   |
 
-## Linux fsck命令实例详解
+## 示例
 
 示例中将演示`fsck`命令如何在实际中被使用。
 

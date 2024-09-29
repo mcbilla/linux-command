@@ -1,13 +1,45 @@
 grep
 ===
 
-强大的文本搜索工具
+在文件中搜索字符串和正则表达式
 
 ## 补充说明
 
-**grep** （global search regular expression(RE) and print out the line，全面搜索正则表达式并把行打印出来）是一种强大的文本搜索工具，它能使用正则表达式搜索文本，并把匹配的行打印出来。用于过滤/搜索的特定字符。可使用正则表达式能配合多种命令使用，使用上十分灵活。
+**grep** （global search regular expression(RE) and print out the line，全面搜索正则表达式并把行打印出来）是一种强大的文本搜索工具，它能使用正则表达式搜索文本，并把匹配的行打印出来。用于过滤/搜索的特定字符。可使用正则表达式能配合多种命令使用，用于日志分析，配置文件检查，代码审查，文本搜索等多种场景。
 
-###  选项 
+## 适用的Linux版本
+
+grep命令是一个标准的Linux工具，它适用于大多数的Linux发行版，如Ubuntu, Debian, CentOS, Fedora等。如果你的系统没有安装grep命令，你可以使用以下命令来安装它：
+
+* 对于基于Debian的系统，如Ubuntu，你可以使用apt-get命令来安装：
+
+```shell
+
+$ sudo apt-get install grep
+
+```
+
+* 对于基于Red Hat的系统，如CentOS，你可以使用yum或dnf命令来安装：
+
+```shell
+$ sudo yum install grep
+```
+
+或者
+
+```shell
+$ sudo dnf install grep
+```
+
+## 命令语法
+
+```shell
+grep [options] 'pattern' file
+```
+
+grep 指令用于查找内容包含指定的匹配内容的文件，如果发现某文件的内容符合所指定的匹配内容，会把含有匹配内容的那一列显示出来。
+
+##  选项 
 
 ```shell
 -a --text  # 不要忽略二进制数据。
@@ -41,7 +73,9 @@ grep
 -m <num> --max-count=<num> # 找到num行结果后停止查找，用来限制匹配行数
 ```
 
-### 规则表达式
+### pattern
+
+pattern 可以使用正则表达式语法
 
 ```shell
 ^    # 锚定行的开始 如：'^grep'匹配所有以grep开头的行。    
@@ -62,161 +96,19 @@ x\{m,n\}  # 重复字符x，至少m次，不多于n次，如：'o\{5,10\}'匹配
 \b    # 单词锁定符，如: '\bgrep\b'只匹配grep。  
 ```
 
-## grep命令常见用法  
+## 示例
 
-在文件中搜索一个单词，命令会返回一个包含 **“match_pattern”** 的文本行：
-
-```shell
-grep match_pattern file_name
-grep "match_pattern" file_name
-```
-
-在多个文件中查找：
+### 1、普通查找
 
 ```shell
-grep "match_pattern" file_1 file_2 file_3 ...
+# 在后缀为file的文件中查找包含字符串word的所有行
+$ grep "word" *file
+
+# 在当前目录下所有文件中查找包含字符串word的所有行
+$ grep "word" ./*
 ```
 
-输出除之外的所有行  **-v**  选项：
-
-```shell
-grep -v "match_pattern" file_name
-```
-
-标记匹配颜色  **--color=auto**  选项：
-
-```shell
-grep "match_pattern" file_name --color=auto
-```
-
-使用正则表达式  **-E**  选项：
-
-```shell
-grep -E "[1-9]+"
-# 或
-egrep "[1-9]+"
-```
-使用正则表达式  **-P**  选项：
-
-```shell
-grep -P "(\d{3}\-){2}\d{4}" file_name
-```
-
-
-只输出文件中匹配到的部分  **-o**  选项：
-
-```shell
-echo this is a test line. | grep -o -E "[a-z]+\."
-line.
-
-echo this is a test line. | egrep -o "[a-z]+\."
-line.
-```
-
-统计文件或者文本中包含匹配字符串的行数  **-c**  选项：
-
-```shell
-grep -c "text" file_name
-```
-
-搜索命令行历史记录中 输入过 `git` 命令的记录：
-
-```shell
-history | grep git
-```
-
-输出包含匹配字符串的行数  **-n**  选项：
-
-```shell
-grep "text" -n file_name
-# 或
-cat file_name | grep "text" -n
-
-#多个文件
-grep "text" -n file_1 file_2
-```
-
-打印样式匹配所位于的字符或字节偏移：
-
-```shell
-echo gun is not unix | grep -b -o "not"
-7:not
-#一行中字符串的字符偏移是从该行的第一个字符开始计算，起始值为0。选项  **-b -o**  一般总是配合使用。
-```
-
-搜索多个文件并查找匹配文本在哪些文件中：
-
-```shell
-grep -l "text" file1 file2 file3...
-```
-
-###  grep递归搜索文件 
-
-在多级目录中对文本进行递归搜索：
-
-```shell
-grep "text" . -r -n
-# .表示当前目录。
-```
-
-忽略匹配样式中的字符大小写：
-
-```shell
-echo "hello world" | grep -i "HELLO"
-# hello
-```
-
-选项  **-e**  制动多个匹配样式：
-
-```shell
-echo this is a text line | grep -e "is" -e "line" -o
-is
-is
-line
-
-#也可以使用 **-f** 选项来匹配多个样式，在样式文件中逐行写出需要匹配的字符。
-cat patfile
-aaa
-bbb
-
-echo aaa bbb ccc ddd eee | grep -f patfile -o
-```
-
-在grep搜索结果中包括或者排除指定文件：
-
-```shell
-# 只在目录中所有的.php和.html文件中递归搜索字符"main()"
-grep "main()" . -r --include *.{php,html}
-
-# 在搜索结果中排除所有README文件
-grep "main()" . -r --exclude "README"
-
-# 在搜索结果中排除filelist文件列表里的文件
-grep "main()" . -r --exclude-from filelist
-
-```
-
-使用0值字节后缀的grep与xargs：
-
-```shell
-# 测试文件：
-echo "aaa" > file1
-echo "bbb" > file2
-echo "aaa" > file3
-
-grep "aaa" file* -lZ | xargs -0 rm
-
-# 执行后会删除file1和file3，grep输出用-Z选项来指定以0值字节作为终结符文件名（\0），xargs -0 读取输入并用0值字节终结符分隔文件名，然后删除匹配文件，-Z通常和-l结合使用。
-```
-
-grep静默输出：
-
-```shell
-grep -q "test" filename
-# 不会输出任何信息，如果命令运行成功返回0，失败则返回非0值。一般用于条件测试。
-```
-
-打印出匹配文本之前或者之后的行：
+### 2、打印出匹配文本之前或者之后的行
 
 ```shell
 # 显示匹配某个结果之后的3行，使用 -A 选项：
@@ -250,6 +142,126 @@ b
 --
 a
 b
+```
+
+### 3、在多个文件中查找
+
+```shell
+grep "text" file_1 file_2 file_3 ...
+
+# 搜索多个文件并查找匹配文本在哪些文件中
+grep -l "text" file1 file2 file3...
+```
+
+### 4、反向查找
+
+```shell
+# 查找出不包含字符串word的所有行
+$ grep -v "word" *file
+
+# 查找不包含多个字符串的所有行
+$ grep -v "word1|word2|word3" *file
+```
+
+### 5、多条件匹配
+
+```shell
+# 满足任意条件（word1、word2和word3之一）将匹配
+$ grep -E "word1|word2|word3"
+
+# 必须同时满足三个条件（word1、word2和word3）才匹配。
+$ grep "word1" file.txt | grep "word2" |grep "word3"
+```
+
+### 6、使用正则表达式
+
+使用正则表达式  **-E**  选项：
+
+```shell
+grep -E "[1-9]+"
+# 或
+egrep "[1-9]+"
+```
+使用正则表达式  **-P**  选项：
+
+```shell
+grep -P "(\d{3}\-){2}\d{4}" file_name
+```
+
+### 7、只输出文件中匹配到的部分
+
+```shell
+echo this is a test line. | grep -o -E "[a-z]+\."
+line.
+
+echo this is a test line. | egrep -o "[a-z]+\."
+line.
+```
+
+### 8、统计文件或者文本中包含匹配字符串的行数
+
+```shell
+grep -c "text" file_name
+```
+
+### 9、输出包含匹配字符串的行数
+
+```shell
+grep "text" -n file_name
+# 或
+cat file_name | grep "text" -n
+
+#多个文件
+grep "text" -n file_1 file_2
+```
+
+### 10、打印样式匹配所位于的字符或字节偏移
+
+```shell
+#一行中字符串的字符偏移是从该行的第一个字符开始计算，起始值为0。选项 *-b -o一般总是配合使用。
+echo gun is not unix | grep -b -o "not"
+7:not
+```
+
+###  11、在多级目录中对文本进行递归搜索
+
+```shell
+grep "text" . -r -n
+# .表示当前目录。
+```
+
+### 12、忽略匹配样式中的字符大小写
+
+```shell
+echo "hello world" | grep -i "HELLO"
+# hello
+```
+
+### 13、在搜索结果中包括或者排除指定文件
+
+```shell
+# 只在目录中所有的.php和.html文件中递归搜索字符"main()"
+grep "main()" . -r --include *.{php,html}
+
+# 在搜索结果中排除所有README文件
+grep "main()" . -r --exclude "README"
+
+# 在搜索结果中排除filelist文件列表里的文件
+grep "main()" . -r --exclude-from filelist
+
+```
+
+### 14、静默输出
+
+```shell
+# 不会输出任何信息，如果命令运行成功返回0，失败则返回非0值。一般用于条件测试。
+grep -q "test" filename
+```
+
+
+
+```shell
+
 ```
 
 
