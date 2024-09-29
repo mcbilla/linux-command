@@ -118,32 +118,67 @@ awk '{print $1; print $2}' test.txt
 
 ## 示例
 
-### 1、指定分隔符
+### 1、指定输入分隔符
+
+##### 第一种方式：通过`-F`参数实现
 
 ```bash
-cat /etc/passwd |awk -F ':' '{print $1}'
+# 第一种方式，使用单引号把分隔符围起来
+awk -F ',' '{print $1}' test.txt
+
+# 第二种方式，不使用单引号，这时候分隔符紧跟在-F参数后面，且中间没有空格
+awk -F, '{print $2}' test.txt
 ```
 
-### 2、格式化
+##### 第二种方式：通过指定内置变量 `FS` 来实现
+
+```shell
+# 通过`-v`参数，设置内置变量`FS`的值为`,`，从而达到将分隔符指定为逗号。
+awk -v FS="," '{print $2}' test.txt
+```
+
+### 2、指定输出分隔符
+
+如果拆分成 2列 以上输出，默认是以空格进行分隔的。例如：
+
+```shell
+awk -v FS=',' '{print $1,$3}' test.txt
+sample1 12
+sample2 23
+sample3 15
+sample4 28
+```
+
+需要指定其它分隔符时，可以通过`-v` 参数指定内置变量`OFS`实现。例如：
+
+```shell
+awk -v FS="," -v OFS="@@" '{print $1,$3}' test.txt
+sample1@@12
+sample2@@23
+sample3@@15
+sample4@@28
+```
+
+### 3、格式化
 
 ```bash
 cat /etc/passwd | awk -F ':' '{printf "%s\\\\t%s\\\\n", $1, $7}'
 ```
 
-### 3、使用BEGIN/END模式
+### 4、使用BEGIN/END模式
 
 ```bash
 cat /etc/passwd |awk  -F ':' 'BEGIN{print "name,shell"} {print $1","$7} END{print "blue,/bin/nosh"}'
 ```
 
-### 4、使用内置变量
+### 5、使用内置变量
 
 ```bash
 # 打印行号和行字段数
 cat /etc/passwd |awk  -F ':' '{print NR, NF, $0}'
 ```
 
-### 5、条件查找
+### 6、条件查找
 
 ```bash
 # 查找第四列小于100的所有行
@@ -153,13 +188,13 @@ cat /etc/passwd |awk -F ':' 'if($3<100){print $0}'
 cat /etc/passwd |awk -F ':' '$3<100{print $0}'
 ```
 
-### 6、三元操作符
+### 7、三元操作符
 
 ```bash
 cat /etc/passwd |awk -F ':' '{usertype=$3&lt;500?"系统用户":"普通用户"; print $1, $3, usertype}'
 ```
 
-### 7、打印奇偶行
+### 8、打印奇偶行
 
 ```bash
 # 打印奇数行
@@ -175,7 +210,7 @@ cat /etc/passwd |awk -F ':' '!(i=!i){print NR, i, $0}'
 
 参考 [awk从放弃到入门（11）：拾遗之”三元运算”与”打印奇偶行”](https://www.zsythink.net/archives/2159)
 
-### 8、使用数组统计出现次数
+### 9、使用数组统计出现次数
 
 ```bash
 awk '{count[$1]++} END{for(i in count){print i, count[i]}}'
