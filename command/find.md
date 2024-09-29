@@ -16,7 +16,8 @@ find path [options] [-print -exec -ok ...]
 * -exec：find命令对匹配的文件执行该参数所给出的shell命令。相应命令的形式为’command’ {  } \;，注意{   }和\；之间的空格。 
 * -ok：和-exec的作用相同，只不过以一种更为安全的模式来执行该参数所给出的shell命令，在执行每一个命令之前，都会给出提示，让用户来确定是否执行。
 
-options 参数说明：
+## 选项
+
 * -amin<分钟>：查找在指定时间曾被存取过的文件或目录，单位以分钟计算；
 * -anewer<参考文件或目录>：查找其存取时间较指定文件或目录的存取时间更接近现在的文件或目录；
 * -atime<24小时数>：查找在指定时间曾被存取过的文件或目录，单位以24小时计算；
@@ -87,157 +88,159 @@ options 参数说明：
 * -xtype<文件类型>：此参数的效果和指定“-type”参数类似，差别在于它针对符号连接检查。
 
 ## 示例
-### 1、根据文件名或者正则表达式查找
+### 根据文件名查找
 列出当前目录及子目录下所有文件和文件夹
-```
+```shell
 $ find .
 ```
 在/home目录下查找以.txt结尾的文件名
-```
+```shell
 $ find /home -name "*.txt"
 ```
 同上，但忽略大小写
-```
+```shell
 $ find /home -iname "*.txt"
 ```
 当前目录及子目录下查找所有以.txt和.pdf结尾的文件
-```
+```shell
 $ find . \( -name "*.txt" -o -name "*.pdf" \)
-
 或
-
 $ find . -name "*.txt" -o -name "*.pdf"
 ```
 基于正则表达式匹配文件路径
-```
+```shell
 $ find . -regex ".*\(\.txt\|\.pdf\)$"
 ```
 同上，但忽略大小写
-```
+```shell
 $ find . -iregex ".*\(\.txt\|\.pdf\)$"
 ```
 
-### 2、反向查找
-找出/home下不是以.txt结尾的文件
-```
-$ find /home ! -name "*.txt"
-```
+### 根据文件类型查找
 
-### 3、根据文件类型查找
 查找目前目录及所有子目录的一般文件
-```
+```shell
 $ find . -type f
 ```
 向下最大深度限制为3
-```
+```shell
 $ find . -maxdepth 3 -type f
 ```
 搜索出深度距离当前目录至少2个子目录的所有文件
-```
+```shell
 $ find . -mindepth 2 -type f
 ```
 
-### 4、根据时间戳查找
+### 根据时间戳查找
 UNIX/Linux文件系统每个文件都有三种时间戳：
 * 访问时间 （-atime/天，-amin/分钟）：用户最近一次访问时间。
 * 修改时间 （-mtime/天，-mmin/分钟）：文件最后一次修改时间。
 * 变化时间 （-ctime/天，-cmin/分钟）：文件数据元（例如权限等）最后一次修改时间。
 
 搜索最近七天内（不包括）被访问过的所有文件
-```
+```shell
 $ find . -type f -atime -7
 ```
 搜索恰好在七天前那一天被访问过的所有文件
-```
+```shell
 $ find . -type f -atime 7
 ```
 搜索七天前（不包括）被访问过的所有文件
-```
+```shell
 $ find . -type f -atime +7
 ```
 搜索访问时间超过10分钟的所有文件
-```
+```shell
 $ find . -type f -amin +10
 ```
 找出比file.log修改时间更长的所有文件
-```
+```shell
 $ find . -type f -newer file.log
 ```
 
-### 5、根据文件大小进行匹配
+### 根据文件大小进行匹配
 搜索大于10KB的文件
-```
+```shell
 $ find . -type f -size +10k
 ```
 搜索小于10KB的文件
-```
+```shell
 $ find . -type f -size -10k
 ```
 搜索等于10KB的文件
-```
+```shell
 $ find . -type f -size 10k
 ```
 
-### 6、删除匹配文件
-删除当前目录下所有.txt文件
+### 反向查找
+
+找出/home下不是以.txt结尾的文件
+
+```shell
+$ find /home ! -name "*.txt"
 ```
+
+### 删除匹配文件
+
+删除当前目录下所有.txt文件
+```shell
 $ find . -type f -name "*.txt" -delete
 ```
 
-### 7、根据文件权限/所有权进行匹配
+### 根据文件权限/所有权进行查找
 当前目录下搜索出权限为777的文件
-```
+```shell
 $ find . -type f -perm 777
 ```
 找出当前目录下权限不是644的php文件
-```
+```shell
 $ find . -type f -name "*.php" ! -perm 644
 ```
 找出当前目录用户tom拥有的所有文件
-```
+```shell
 $ find . -type f -user tom
 ```
 找出当前目录用户组sunk拥有的所有文件
-```
+```shell
 $ find . -type f -group sunk
 ```
 
-### 8、与其他命令结合使用
+### 与其他命令结合使用
 找出当前目录下所有root的文件，并把所有权更改为用户tom
-```
+```shell
 $ find .-type f -user root -exec chown tom {} \;
 ```
 找出自己家目录下所有的.txt文件并删除，-ok 和 -exec 行为一样，不过它会给出提示，是否执行相应的操作。
-```
+```shell
 find $HOME/. -name "*.txt" -ok rm {} \;
 ```
 因为单行命令中-exec参数中无法使用多个命令，以下方法可以实现在-exec之后接受多条命令
-```
+```shell
 -exec ./text.sh {} \;
 ```
 
-### 9、搜索但跳过指定目录
+### 搜索但跳过指定目录
 查找当前目录或者子目录下所有.txt文件，但是跳过子目录sk
-```
+```shell
 # ./sk 不能写成 ./sk/ ，否则没有作用。
 find . -path "./sk" -prune -o -name "*.txt" -print
 ```
 忽略两个目录
-```
+```shell
 # 如果写相对路径必须加上./
 $ find . \( -path ./sk -o  -path ./st \) -prune -o -name "*.txt" -print
 ```
 
-### 10、其他
+### 其他常用
 找到七天前修改过的文件类型为jpeg或jpg的文件
-```
+```shell
 $ find ~ \( -iname '*jpeg' -o -iname '*jpg' \) -type f -mtime -7
 ```
 删除 mac 下自动生成的文件
-```
+```shell
 $ find ./ -name '__MACOSX' -depth -exec rm -rf {} \;
 ```
 统计代码行数
-```
+```shell
 $ find . -name "*.java"|xargs cat|grep -v ^$|wc -l # 代码行数统计, 排除空行
 ```

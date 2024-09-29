@@ -98,7 +98,7 @@ x\{m,n\}  # 重复字符x，至少m次，不多于n次，如：'o\{5,10\}'匹配
 
 ## 示例
 
-### 1、普通查找
+### 普通查找
 
 ```shell
 # 在后缀为file的文件中查找包含字符串word的所有行
@@ -108,7 +108,7 @@ $ grep "word" *file
 $ grep "word" ./*
 ```
 
-### 2、打印出匹配文本之前或者之后的行
+### 打印出匹配文本之前或者之后的行
 
 ```shell
 # 显示匹配某个结果之后的3行，使用 -A 选项：
@@ -144,7 +144,7 @@ a
 b
 ```
 
-### 3、在多个文件中查找
+### 在多个文件中查找
 
 ```shell
 grep "text" file_1 file_2 file_3 ...
@@ -153,7 +153,17 @@ grep "text" file_1 file_2 file_3 ...
 grep -l "text" file1 file2 file3...
 ```
 
-### 4、反向查找
+###  在多级目录中对文本进行递归搜索
+
+```shell
+# .表示当前目录。
+grep -r -n "text" . 
+
+# 只显示包含内容的文件名
+grep -r -l "text" . 
+```
+
+### 反向查找
 
 ```shell
 # 查找出不包含字符串word的所有行
@@ -163,7 +173,7 @@ $ grep -v "word" *file
 $ grep -v "word1|word2|word3" *file
 ```
 
-### 5、多条件匹配
+### 多条件匹配
 
 ```shell
 # 满足任意条件（word1、word2和word3之一）将匹配
@@ -173,7 +183,7 @@ $ grep -E "word1|word2|word3"
 $ grep "word1" file.txt | grep "word2" |grep "word3"
 ```
 
-### 6、使用正则表达式
+### 使用正则表达式
 
 使用正则表达式  **-E**  选项：
 
@@ -188,7 +198,7 @@ egrep "[1-9]+"
 grep -P "(\d{3}\-){2}\d{4}" file_name
 ```
 
-### 7、只输出文件中匹配到的部分
+### 只输出文件中匹配到的部分
 
 ```shell
 echo this is a test line. | grep -o -E "[a-z]+\."
@@ -198,13 +208,13 @@ echo this is a test line. | egrep -o "[a-z]+\."
 line.
 ```
 
-### 8、统计文件或者文本中包含匹配字符串的行数
+### 统计文件或者文本中包含匹配字符串的行数
 
 ```shell
 grep -c "text" file_name
 ```
 
-### 9、输出包含匹配字符串的行数
+### 输出包含匹配字符串的行数
 
 ```shell
 grep "text" -n file_name
@@ -215,7 +225,7 @@ cat file_name | grep "text" -n
 grep "text" -n file_1 file_2
 ```
 
-### 10、打印样式匹配所位于的字符或字节偏移
+### 打印样式匹配所位于的字符或字节偏移
 
 ```shell
 #一行中字符串的字符偏移是从该行的第一个字符开始计算，起始值为0。选项 *-b -o一般总是配合使用。
@@ -223,21 +233,14 @@ echo gun is not unix | grep -b -o "not"
 7:not
 ```
 
-###  11、在多级目录中对文本进行递归搜索
-
-```shell
-grep "text" . -r -n
-# .表示当前目录。
-```
-
-### 12、忽略匹配样式中的字符大小写
+### 忽略匹配样式中的字符大小写
 
 ```shell
 echo "hello world" | grep -i "HELLO"
 # hello
 ```
 
-### 13、在搜索结果中包括或者排除指定文件
+### 在搜索结果中包括或者排除指定文件
 
 ```shell
 # 只在目录中所有的.php和.html文件中递归搜索字符"main()"
@@ -251,17 +254,11 @@ grep "main()" . -r --exclude-from filelist
 
 ```
 
-### 14、静默输出
+### 静默输出
 
 ```shell
 # 不会输出任何信息，如果命令运行成功返回0，失败则返回非0值。一般用于条件测试。
 grep -q "test" filename
-```
-
-
-
-```shell
-
 ```
 
 
