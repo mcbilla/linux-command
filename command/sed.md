@@ -146,17 +146,25 @@ x\{m,n\} # 重复字符x，至少m次，不多于n次，如：/0\{5,10\}/匹配5
 
 ###  替换操作：s命令 
 
-替换文本中的字符串：
+替换文本中的字符串，默认只替换匹配到的第一个字符串
 
 ```shell
 sed 's/book/books/' file
 ```
 
- **-n选项** 和 **p命令** 一起使用表示只打印那些发生替换的行：
+替换文本中的字符串，并替换所有匹配到的字符串
 
-sed -n 's/test/TEST/p' file
+```shell
+sed 's/book/books/g' file
+```
 
-直接编辑文件 **选项-i** ，会匹配file文件中每一行的所有book替换为books：
+**-n** 和 **p** 一起使用表示只打印那些发生替换的行：
+
+```shell
+sed -n 's/book/books/p' file
+```
+
+**-i** 表示会编辑原文件 ，并替换所有匹配到的字符串
 
 ```shell
 sed -i 's/book/books/g' file
