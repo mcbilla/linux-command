@@ -1,29 +1,47 @@
 sort
 ===
 
-对文本文件中所有行进行排序。
+对文本文件中所有行进行排序
 
-## 概要
+## 补充说明
+
+Linux sort 命令是用于对文本文件的内容进行排序的工具。它可以按照不同的规则和选项来对文本行进行排序，从而提高可读性和便利性。sort 命令的全称是 sort lines of text files，意思是对文本文件的行进行排序。
+
+## 适用的Linux版本
+
+sort 命令是 GNU coreutils 包中的一个常用命令，它在大多数 Linux 发行版中都是默认安装的。如果没有安装 sort 命令，可以使用以下命令来安装：
+
+* CentOS 7 和 CentOS 8
 
 ```shell
-sort [OPTION]... [FILE]...
-sort [OPTION]... --files0-from=F
+yum install coreutils
 ```
 
-## 主要用途
+* Ubuntu 和 Debian
 
-- 将所有输入文件的内容排序后并输出。
-- 当没有文件或文件为`-`时，读取标准输入。
+```shell
+apt-get install coreutils
+```
+
+## 命令语法
+
+```shell
+sort [options] [file...]
+```
+
+* options是可选的参数，用于指定排序的规则和选项
+* file...是可选的文件名，用于指定要排序的文件。如果没有指定文件名，则 sort 命令会从标准输入读取数据。
 
 ## 选项
 
 排序选项：
-```shell
--b, --ignore-leading-blanks    忽略开头的空白。
--d, --dictionary-order         仅考虑空白、字母、数字。
+
+```
+-b, --ignore-leading-blanks    忽略每行前面开始出的空格字符。
+-d, --dictionary-order         排序时，处理英文字母、数字及空格字符，忽略其他的字符。
 -f, --ignore-case              将小写字母作为大写字母考虑。
 -g, --general-numeric-sort     根据数字排序。
--i, --ignore-nonprinting       排除不可打印字符。
+-i, --ignore-nonprinting       排序时，除了040至176之间的ASCII字符外，忽略其他的字符（排除不可打印字符）。
 -M, --month-sort               按照非月份、一月、十二月的顺序排序。
 -h, --human-numeric-sort       根据存储容量排序(注意使用大写字母，例如：2K 1G)。
 -n, --numeric-sort             根据数字排序。
@@ -35,7 +53,8 @@ sort [OPTION]... --files0-from=F
 ```
 
 其他选项：
-```shell
+
+```
 --batch-size=NMERGE                    一次合并最多NMERGE个输入；超过部分使用临时文件。
 -c, --check, --check=diagnose-first    检查输入是否已排序，该操作不会执行排序。
 -C, --check=quiet, --check=silent      类似于 -c 选项，但不输出第一个未排序的行。
@@ -55,13 +74,11 @@ sort [OPTION]... --files0-from=F
 --help                                 显示帮助信息并退出。
 --version                              显示版本信息并退出。
 
-
 KEYDEF的格式为：F[.C][OPTS][,F[.C][OPTS]] ，表示开始到结束的位置。
 F表示列的编号
 C表示
 OPTS为[bdfgiMhnRrV]中的一到多个字符，用于覆盖当前排序选项。
 使用--debug选项可诊断出错误的用法。
-
 
 SIZE 可以有以下的乘法后缀:
 % 内存的1%；
@@ -70,145 +87,387 @@ K 1024（默认）；
 剩余的 M, G, T, P, E, Z, Y 可以类推出来。
 ```
 
-## 参数
+### 实例1：按照字母顺序排序
 
-FILE（可选）：要处理的文件，可以为任意数量。
-
-## 返回值
-
-返回0表示成功，返回非0值表示失败。
-
-## 例子
-
-sort将文件/文本的每一行作为一个单位相互比较，比较原则是从首字符向后依次按ASCII码值进行比较，最后将他们按升序输出。
+假设有一个文件`names.txt`，其内容如下：
 
 ```shell
-root@[mail text]# cat sort.txt
-aaa:10:1.1
-ccc:30:3.3
-ddd:40:4.4
-bbb:20:2.2
-eee:50:5.5
-eee:50:5.5
-
-[root@mail text]# sort sort.txt
-aaa:10:1.1
-bbb:20:2.2
-ccc:30:3.3
-ddd:40:4.4
-eee:50:5.5
-eee:50:5.5
+$ cat names.txt
+Alice
+Bob
+Charlie
+David
+Eve
+Frank
 ```
 
-忽略相同行使用`-u`选项或者`uniq`：
+默认的方式将文本文件的第一列以 ASCII 码的次序排列，可以使用以下命令：
 
 ```shell
-[root@mail text]# cat sort.txt
-aaa:10:1.1
-ccc:30:3.3
-ddd:40:4.4
-bbb:20:2.2
-eee:50:5.5
-eee:50:5.5
-
-[root@mail text]# sort -u sort.txt
-aaa:10:1.1
-bbb:20:2.2
-ccc:30:3.3
-ddd:40:4.4
-eee:50:5.5
-
-[root@mail text]# uniq sort.txt
-aaa:10:1.1
-ccc:30:3.3
-ddd:40:4.4
-bbb:20:2.2
-eee:50:5.5
+$ sort names.txt
+Alice
+Bob
+Charlie
+David
+Eve
+Frank
 ```
 
-`sort`的`-n、-r、-k、-t`选项的使用：
+### 实例2：按照数字顺序排序
+
+假设有一个文件`numbers.txt`，其内容如下：
 
 ```shell
-[root@mail text]# cat sort.txt
-AAA:BB:CC
-aaa:30:1.6
-ccc:50:3.3
-ddd:20:4.2
-bbb:10:2.5
-eee:40:5.4
-eee:60:5.1
-
-# 将BB列按照数字从小到大顺序排列：
-[root@mail text]# sort -nk 2 -t: sort.txt
-AAA:BB:CC
-bbb:10:2.5
-ddd:20:4.2
-aaa:30:1.6
-eee:40:5.4
-ccc:50:3.3
-eee:60:5.1
-
-# 将CC列数字从大到小顺序排列：
-# -n是按照数字大小排序，-r是以相反顺序，-k是指定需要排序的栏位，-t指定栏位分隔符为冒号
-[root@mail text]# sort -nrk 3 -t: sort.txt
-eee:40:5.4
-eee:60:5.1
-ddd:20:4.2
-ccc:50:3.3
-bbb:10:2.5
-aaa:30:1.6
-AAA:BB:CC
+$ cat numbers.txt
+10
+5
+100
+50
+1
 ```
 
-关于`-k`选项的解读和例子：
-
--k选项深度解读：
+要按照数字顺序对文件进行排序，可以使用以下命令：
 
 ```shell
-FStart.CStart Modifier,FEnd.CEnd Modifier
--------Start--------,-------End--------
- FStart.CStart 选项  ,  FEnd.CEnd 选项
+$ sort -n numbers.txt
+1
+5
+10
+50
+100
 ```
 
-这个语法格式可以被其中的逗号`,`分为两大部分，**Start** 部分和 **End** 部分。
-Start部分由三部分组成，其中的Modifier部分就是我们之前说过的选项部分；
-我们重点说说`Start`部分的`FStart`和`C.Start`；`C.Start`是可以省略的，省略的话就表示从本域的开头部分开始。`FStart.CStart`，其中`FStart`就是表示使用的域，而`CStart`则表示在`FStart`域中从第几个字符开始算排序首字符。
-同理，在End部分中，你可以设定`FEnd.CEnd`，如果你省略`.CEnd`或将它设定为0，则表示结尾到本域的最后一个字符。
-
-
-例子：从公司英文名称的第二个字母开始排序：
+注意，如果不使用`-n`选项，sort命令会按照字符串的顺序进行排序，即：
 
 ```shell
-$ sort -t ' ' -k 1.2 facebook.txt
-baidu 100 5000
-sohu 100 4500
-google 110 5000
-guge 50 3000
+$ sort numbers.txt
+1
+10
+100
+5
+50
 ```
 
-解读：使用了`-k 1.2`，表示对第一个域的第二个字符开始到本域的最后一个字符为止的字符串进行排序。你会发现baidu因为第二个字母是a而名列榜首。sohu和google第二个字符都是o，但sohu的h在google的o前面，所以两者分别排在第二和第三。guge只能屈居第四了。
+### 实例3：按照逆序排序
 
+要按照逆序对文件进行排序，可以使用`-r`选项。例如，要按照字母逆序对文件`names.txt`进行排序，可以使用以下命令：
 
-例子：只针对公司英文名称的第二个字母进行排序，如果相同的按照员工工资进行降序排序：
+```
+$ sort -r names.txt
+Frank
+Eve
+David
+Charlie
+Bob
+Alice
+```
+
+要按照数字逆序对文件`numbers.txt`进行排序，可以使用以下命令：
 
 ```shell
-$ sort -t ' ' -k 1.2,1.2 -nrk 3,3 facebook.txt
-baidu 100 5000
-google 110 5000
-sohu 100 4500
-guge 50 3000
+$ sort -nr numbers.txt
+100
+50
+10
+5
+1
 ```
 
-解读：由于只对第二个字母进行排序，所以我们使用了`-k 1.2,1.2`的表示方式，表示我们只对第二个字母进行排序（如果你问我使用`-k 1.2`怎么不行？当然不行，因为你省略了End部分，这就意味着你将对从第二个字母起到本域最后一个字符为止的字符串进行排序）。
-对员工工资进行排序，我们也使用了`-k 3,3`，这是最准确的表述，表示我们只对本域进行排序，因为如果你省略了后面的3，就变成了我们对第3个域开始到最后一个域位置的内容进行排序了。
+### 实例4：按照字段或列排序
 
+sort命令可以使用`-t`选项来指定字段或列的分隔符，然后使用`-k`选项来指定要排序的字段或列的范围。例如，假设有一个文件`scores.txt`，其内容如下：
 
-### 注意
+```shell
+$ cat scores.txt
+Alice:90:80:85
+Bob:95:75:80
+Charlie:85:95:90
+David:80:90:95
+Eve:75:85:75
+Frank:70:80:70
+```
 
-1. [关于-g和-n选项的区别：stackoverflow](https://stackoverflow.com/questions/1255782/whats-the-difference-between-general-numeric-sort-and-numeric-sort-options)
+每一行表示一个学生的姓名和三门课程的成绩，用冒号分隔。要按照第一门课程的成绩进行排序，可以使用以下命令：
 
-2. 关于这个复杂命令的学习，建议您阅读info文档及参考博客、问答网站等。
+```shell
+$ sort -t':' -k2 scores.txt
+Frank:70:80:70
+Eve:75:85:75
+David:80:90:95
+Charlie:85:95:90
+Alice:90:80:85
+Bob:95:75:80
+```
 
-3. 该命令是`GNU coreutils`包中的命令，相关的帮助信息请查看`man -s 1 shuf`，`info coreutils 'shuf invocation'`。
+如果不指定字段或列的结束位置，默认是到行尾。如果要指定字段或列的结束位置，可以在`-k`选项后加上一个逗号和结束位置。例如，要按照第二门课程的成绩进行排序，可以使用以下命令：
 
+```
+$ sort -t':' -k3,3 scores.txt
+Bob:95:75:80
+Alice:90:80:85
+Frank:70:80:70
+Eve:75:85:75
+David:80:90:95
+Charlie:85:95:90
+```
 
+如果要按照多个字段或列进行排序，可以在`-k`选项后加上多个范围。例如，要先按照第一门课程的成绩进行排序，再按照第二门课程的成绩进行排序，可以使用以下命令：
+
+```shell
+$ sort -t':' -k2,2 -k3,3 scores.txt
+Frank:70:80:70
+Eve:75:85:75
+David:80:90:95
+Charlie:85:95:90
+Alice:90:80:85
+Bob :95 :75 :80
+```
+
+### 实例5：按照月份排序
+
+假设有一个文件`months.txt`，其内容如下：
+
+```shell
+$ cat months.txt
+Jan
+Feb
+Mar
+Apr
+May
+Jun
+Jul
+Aug
+Sep
+Oct
+Nov
+Dec
+```
+
+要按照月份的顺序对文件进行排序，可以使用`-M`选项。例如，要按照升序排序，可以使用以下命令：
+
+```shell
+$ sort -M months.txt
+Jan
+Feb
+Mar
+Apr
+May
+Jun
+Jul
+Aug
+Sep
+Oct
+Nov
+Dec
+```
+
+要按照降序排序，可以使用`-r`选项。例如，要按照降序排序，可以使用以下命令：
+
+```shell
+$ sort -Mr months.txt
+Dec
+Nov
+Oct
+Sep
+Aug
+Jul
+Jun
+May
+Apr
+Mar
+Feb
+Jan
+```
+
+### 实例5：按照月份排序
+
+假设有一个文件`months.txt`，其内容如下：
+
+```shell
+$ cat months.txt
+Jan
+Feb
+Mar
+Apr
+May
+Jun
+Jul
+Aug
+Sep
+Oct
+Nov
+Dec
+```
+
+要按照月份的顺序对文件进行排序，可以使用`-M`选项。例如，使用以下命令：
+
+```shell
+$ sort -M months.txt
+Jan
+Feb
+Mar
+Apr
+May
+Jun
+Jul
+Aug
+Sep
+Oct
+Nov
+Dec
+```
+
+### 实例6：按照版本号排序
+
+假设有一个文件`versions.txt`，其内容如下：
+
+```shell
+$ cat versions.txt
+1.0.0
+1.0.1
+1.0.10
+1.0.2
+1.1.0
+1.2.0
+2.0.0
+```
+
+要按照版本号的顺序对文件进行排序，可以使用`-V`选项。例如，使用以下命令：
+
+```
+[linux@bashcommandnotfound.cn ~]$ sort -V versions.txt
+1.0.0
+1.0.1
+1.0.2
+1.0.10
+1.1.0
+1.2.0
+2.0.0
+```
+
+### 实例7：按照人类可读的数字排序
+
+假设有一个文件`sizes.txt`，其内容如下：
+
+```shell
+$ cat sizes.txt
+10K
+5M
+100K
+50M
+1G
+```
+
+要按照人类可读的数字的顺序对文件进行排序，可以使用`-h`选项。例如，使用以下命令：
+
+```shell
+$ sort -h sizes.txt
+10K
+100K
+5M
+50M
+1G
+```
+
+### 实例8：随机排序
+
+要对文件或标准输入的内容进行随机排序，可以使用`-R`选项。例如，要对文件`names.txt`进行随机排序，可以使用以下命令：
+
+```shell
+$ sort -R names.txt
+Charlie
+Alice
+Frank
+Eve
+David
+Bob
+```
+
+每次执行该命令，输出的结果可能都不一样。
+
+### 实例9：去重或合并
+
+sort命令可以使用`-u`选项来去除重复的行。例如，假设有一个文件`colors.txt`，其内容如下：
+
+```shell
+$ cat colors.txt
+red
+blue
+green
+red
+yellow
+blue
+```
+
+要去除重复的颜色，可以使用以下命令：
+
+```shell
+$ sort -u colors.txt
+blue
+green
+red
+yellow
+```
+
+sort命令也可以使用`-m`选项来合并多个已经排序好的文件。例如，假设有两个文件`colors1.txt`和`colors2.txt`，其内容分别如下：
+
+```shell
+$ cat colors1.txt
+blue
+green
+red
+yellow
+
+$ cat colors2.txt
+black
+cyan
+magenta
+white
+```
+
+要合并这两个文件，可以使用以下命令：
+
+```shell
+$ sort -m colors1.txt colors2.txt
+black
+blue
+cyan
+green
+magenta
+red
+white
+yellow
+```
+
+### 实例10：检查是否已经排序
+
+sort命令可以使用`-c`选项来检查文件或标准输入的内容是否已经按照顺序排序。如果已经排序，sort命令不会输出任何内容；如果没有排序，sort命令会输出第一个乱序的行。例如，要检查文件`names.txt`是否已经按照字母顺序排序，可以使用以下命令：
+
+```shell
+$ sort -c names.txt
+sort: names.txt:3: disorder: Charlie
+```
+
+这表示第三行的`Charlie`没有按照字母顺序排序。
+
+要检查文件`numbers.txt`是否已经按照数字顺序排序，可以使用以下命令：
+
+```shell
+$ sort -nc numbers.txt
+sort: numbers.txt:4: disorder: 5
+```
+
+这表示第四行的`5`没有按照数字顺序排序。
+
+## Linux sort命令的注意事项
+
+以下是一些使用sort命令时需要注意的事项：
+
+- sort命令默认是按照当前的区域设置（locale）来进行排序的，这可能会影响到不同语言或字符集的排序结果。如果要使用标准的ASCII字符集来进行排序，可以在执行sort命令之前设置环境变量`LC_ALL=C`。
+- sort命令默认是将标准错误输出（stderr）重定向到标准输出（stdout）的，这可能会导致一些错误信息被混入到排序结果中。如果要避免这种情况，可以在执行sort命令时加上`2>/dev/null`来忽略错误信息。
+- sort命令默认是将排序结果输出到标准输出（stdout）的，如果要将排序结果保存到文件中，可以使用`o`选项或者重定向符号`>`。例如，要将文件`names.txt`按照字母顺序排序后保存到文件`sorted_names.txt`中，可以使用以下两种方法之一：
+
+```
+$ sort names.txt -o sorted_names.txt
+$ sort names.txt > sorted_names.txt
+```

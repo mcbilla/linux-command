@@ -1,82 +1,244 @@
 uniq
 ===
 
-显示或忽略重复的行。
+检查和删除文本文件中的重复行
 
-## 概要
+## 适用的Linux版本
+
+uniq 命令是 GNU coreutils 软件包的一部分，它在大多数 Linux 发行版中都是默认安装的。如果没有安装，可以执行下面命令来安装：
+
+* CentOS 7
 
 ```shell
-uniq [OPTION]... [INPUT [OUTPUT]]
+$ sudo yum install coreutils
 ```
 
-## 主要用途
+* CentOS 8
 
-- 将输入文件（或标准输入）中邻近的重复行写入到输出文件（或标准输出）中。
-- 当没有选项时，邻近的重复行将合并为一个。
+```shell
+$ sudo dnf install coreutils
+```
 
+* Ubuntu
+
+```shell
+$ sudo apt install coreutils
+```
+
+## 命令语法
+
+```shell
+uniq [options] [input_file] [output_file]
+```
+
+* options 是可选的参数，用来指定一些选项。
+
+* input_file 是要处理的已排序的文本文件，如果没有指定，则从标准输入读取数据。
+
+* output_file 是要输出的文本文件，如果没有指定，则输出到标准输出设备（显示终端）。
 
 ## 选项
 
 ```shell
--c, --count                在每行开头增加重复次数。
--d, --repeated             所有邻近的重复行只被打印一次。
--D                         所有邻近的重复行将全部打印。
---all-repeated[=METHOD]    类似于 -D，但允许每组之间以空行分割。METHOD取值范围{none(默认)，prepend，separate}。
--f, --skip-fields=N        跳过对前N个列的比较。
---group[=METHOD]           显示所有行，允许每组之间以空行分割。METHOD取值范围：{separate(默认)，prepend，append，both}。
--i, --ignore-case          忽略大小写的差异。
--s, --skip-chars=N         跳过对前N个字符的比较。
--u, --unique               只打印非邻近的重复行。
--z, --zero-terminated      设置行终止符为NUL（空），而不是换行符。
--w, --check-chars=N        只对每行前N个字符进行比较。
---help                     显示帮助信息并退出。
---version                  显示版本信息并退出。
+-c 或 --count	在每行旁边显示该行在文件中出现的次数
+-d 或 --repeated	只显示重复出现的行
+-u 或 --unique	只显示只出现一次的行
+-i 或 --ignore-case	忽略大小写差异
+-f num 或 --skip-fields=num	忽略比较前num个字段
+-s num 或 --skip-chars=num	忽略比较前num个字符
+-w num 或 --check-chars=num	只比较每行前num个字符
 ```
 
-## 参数
+## 示例
 
-INPUT（可选）：输入文件，不提供时为标准输入。
-
-OUTPUT（可选）：输出文件，不提供时为标准输出。
-
-## 返回值
-
-返回0表示成功，返回非0值表示失败。
-
-## 例子
-
-注意：命令2和命令3结果一样，命令1仅作了相邻行的去重。
+### 文本去重
 
 ```shell
-uniq file.txt
-sort file.txt | uniq
-sort -u file.txt
+$ cat testfile
+test 30  
+test 30  
+test 30  
+Hello 95  
+Hello 95  
+Hello 95  
+Hello 95  
+Linux 85  
+Linux 85 
 ```
 
-只显示单一行，区别在于是否执行排序：
+使用 uniq 命令删除重复的行后，有如下输出结果：
 
 ```shell
-uniq -u file.txt
-sort file.txt | uniq -u
+$ uniq testfile
+test 30  
+Hello 95  
+Linux 85 
 ```
 
-统计各行在文件中出现的次数：
+当重复的行并不相邻时，uniq 命令是不起作用的。即若文件内容为以下时，uniq 命令不起作用：
 
 ```shell
-sort file.txt | uniq -c
+$ cat testfile1
+test 30  
+Hello 95  
+Linux 85 
+test 30  
+Hello 95  
+Linux 85 
+test 30  
+Hello 95  
+Linux 85 
 ```
 
-在文件中找出重复的行：
+这时我们就可以使用 sort：
 
 ```shell
-sort file.txt | uniq -d
+$ sort  testfile1 | uniq
+Hello 95  
+Linux 85 
+test 30
 ```
 
+### 统计各行在文件中出现的次数
 
-### 注意
+我们有一个文本文件 test.txt，它包含以下内容：
 
-1. `uniq`只检测邻近的行是否重复，`sort -u`将输入文件先排序然后再处理重复行。 
+```shell
+$ cat test.txt
+apple
+banana
+orange
+apple
+pear
+banana
+apple
+orange
 
-2. 该命令是`GNU coreutils`包中的命令，相关的帮助信息请查看`man -s 1 uniq`，`info coreutils 'uniq invocation'`。
+```
 
+统计各行在文件中出现的次数，并使用 `-c` 选项来显示计数：
+
+```shell
+$ sort test.txt | uniq -c
+      3 apple
+      2 banana
+      2 orange
+      1 pear
+```
+
+### 只显示重复出现的行
+
+我们可以使用 `-d` 选项来只显示重复出现的行，不显示只出现一次的行：
+
+```shell
+$ sort test.txt | uniq -d
+apple
+banana
+orange
+```
+
+### 只显示只出现一次的行
+
+我们可以使用 `-u` 选项来只显示只出现一次的行，不显示重复出现的行：
+
+```shell
+$ sort test.txt | uniq -u
+pear
+```
+
+### 忽略大小写差异
+
+我们有一个文本文件test2.txt，它包含以下内容：
+
+```shell
+$ cat test2.txt
+Apple
+apple
+Banana
+banana
+Orange
+orange
+Pear
+pear
+```
+
+我们可以使用 `-i` 选项来忽略大小写差异，将大写和小写视为相同：
+
+```shell
+$ sort test2.txt | uniq -i -c
+      2 Apple
+      2 Banana
+      2 Orange
+      2 Pear
+```
+
+### 忽略比较前num个字段或字符
+
+我们有一个文本文件test3.txt，它包含以下内容：
+
+```shell
+$ cat test3.txt
+1 apple red
+2 banana yellow
+3 orange orange
+4 apple green
+5 pear yellow
+6 banana green
+7 apple yellow
+8 orange green
+```
+
+我们可以使用 `-f num`选项来忽略比较前 num 个字段，以空格为字段分隔符。例如，如果我们想忽略第一个字段，只比较水果的名称，我们可以使用 -f 1 选项：
+
+```shell
+$ sort test3.txt | uniq -f 1 -c 
+      3 1 apple red 
+      2 2 banana yellow 
+      2 3 orange orange 
+      1 5 pear yellow 
+```
+
+我们也可以使用 `-s num` 选项来忽略比较前num个字符。例如，如果我们想忽略前两个字符，只比较水果的颜色，我们可以使用 -s 2 选项：
+
+```shell
+$ sort test3.txt | uniq -s 2 -c 
+      1 1 apple red 
+      3 2 banana yellow 
+      1 3 orange orange 
+      1 4 apple green 
+      1 6 banana green 
+      1 8 orange green 
+```
+
+### 只比较每行前num个字符
+
+我们有一个文本文件test4.txt，它包含以下内容：
+
+```shell
+$ cat test4.txt 
+apple pie 
+apple juice 
+banana bread 
+banana split 
+orange juice 
+orange peel 
+pear jam 
+pear cake 
+```
+
+我们可以使用 `-w num` 选项来只比较每行前num个字符。例如，如果我们想只比较水果的名称，不比较后面的食物，我们可以使用 -w 5 选项：
+
+```shell
+$ sort test4.txt | uniq -w 5 -c 
+      2 apple pie 
+      2 banana bread 
+      2 orange juice 
+      2 pear jam  
+```
+
+## Linux uniq命令的注意事项
+
+* uniq 命令要求输入文件是已排序的，否则它不能正确地检测重复的行。因此，通常需要先使用 sort 命令对文件进行排序，然后再使用 uniq 命令进行处理。
+* uniq命令只能检测相邻的重复行，如果重复行不相邻，它会被视为唯一的行。因此，在使用uniq命令之前，最好先对文件进行排序，以便将重复行放在一起。
+* uniq命令默认区分大小写，如果想忽略大小写差异，需要使用 `-i` 选项。
 
