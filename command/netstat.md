@@ -7,7 +7,7 @@ netstat
 
 netstat的全称是network statistics（网络统计），是一个用来显示网络状态的命令，它可以显示网络连接、路由表、接口统计、伪装连接、多播成员等信息，是Linux和Unix-like系统中的一个常用工具，也可以在Windows和Mac上使用。netstat可以帮助网站管理员和内容创建者分析和优化他们的网站性能和安全。
 
-###  适用的Linux版本
+##  适用的Linux版本
 
 netstat 命令在大多数Linux发行版中都是可用的，但是在一些较新的版本中，它可能被ss命令所取代。ss命令是socket statistics（套接字统计）的缩写，它提供了更多的功能和更快的速度。如果你的Linux系统没有安装netstat命令，你可以使用以下方法来安装它：
 

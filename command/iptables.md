@@ -1,7 +1,7 @@
 iptables
 ===
 
-Linux上常用的防火墙软件
+Linux上常用的防火墙软件刷，监控和过滤从服务器进出的网络数据包
 
 ## 补充说明
 
@@ -16,6 +16,24 @@ netfilter/iptables过滤防火墙系统是一种功能强大的工具，可用�
 netfilter 组件也称为内核空间（kernelspace），是内核的一部分，由一些信息包过滤表组成，这些表包含内核用来控制信息包过滤处理的规则集。
 
 iptables 组件是一种工具，也称为用户空间（userspace），它使插入、修改和除去信息包过滤表中的规则变得容易。
+
+## 适用的Linux版本
+
+iptables命令适用于大多数Linux发行版，如Ubuntu、Debian、CentOS、Fedora等。如果您的系统没有预装iptables，您可以使用以下命令来安装：
+
+```
+$ sudo apt-get update # Ubuntu/Debian
+$ sudo apt-get install iptables
+$ sudo yum update # CentOS/Fedora
+$ sudo yum install iptables
+
+```
+
+注意
+
+* iptables命令只适用于IPv4协议，如果您需要对IPv6协议进行防火墙设置，您需要使用ip6tables命令。
+* firewalld是新一代的防火墙工具，用于CentOS7和Fedora以后的版本，用于替代iptables。
+* iptables的规则是顺序敏感的，链中的规则是自上而下检查的。数据包会受到链中首个匹配的规则的影响，其余的规则被忽略。
 
 ## 基本原理
 
