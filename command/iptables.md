@@ -7,154 +7,17 @@ Linux上常用的防火墙软件
 
 **iptables命令** 是Linux上常用的防火墙软件，是netfilter项目的一部分。可以直接配置，也可以通过许多前端和图形界面配置。
 
-<!-- TOC -->
+Iptabels是与Linux内核集成的包过滤防火墙系统，几乎所有的linux发行版本都会包含Iptables的功能。如果 Linux 系统连接到因特网或 LAN、服务器或连接 LAN 和因特网的代理服务器， 则Iptables有利于在 Linux 系统上更好地控制 IP 信息包过滤和防火墙配置。
 
-- [补充说明](#补充说明)
-  - [语法](#语法)
-  - [选项](#选项)
-- [基本参数](#基本参数)
-    - [命令选项输入顺序](#命令选项输入顺序)
-    - [工作机制](#工作机制)
-    - [防火墙的策略](#防火墙的策略)
-    - [防火墙的策略](#防火墙的策略-1)
-  - [实例](#实例)
-    - [清空当前的所有规则和计数](#清空当前的所有规则和计数)
-    - [配置允许ssh端口连接](#配置允许ssh端口连接)
-    - [允许本地回环地址可以正常使用](#允许本地回环地址可以正常使用)
-    - [设置默认的规则](#设置默认的规则)
-    - [配置白名单](#配置白名单)
-    - [开启相应的服务端口](#开启相应的服务端口)
-    - [保存规则到配置文件中](#保存规则到配置文件中)
-    - [列出已设置的规则](#列出已设置的规则)
-    - [清除已有规则](#清除已有规则)
-    - [删除已添加的规则](#删除已添加的规则)
-    - [开放指定的端口](#开放指定的端口)
-    - [屏蔽IP](#屏蔽ip)
-    - [指定数据包出去的网络接口](#指定数据包出去的网络接口)
-    - [查看已添加的规则](#查看已添加的规则)
-    - [启动网络转发规则](#启动网络转发规则)
-    - [端口映射](#端口映射)
-    - [字符串匹配](#字符串匹配)
-    - [阻止Windows蠕虫的攻击](#阻止windows蠕虫的攻击)
-    - [防止SYN洪水攻击](#防止syn洪水攻击)
+netfilter/iptables过滤防火墙系统是一种功能强大的工具，可用于添加、编辑和除去规则，这些规则是在做信息包过滤决定时，防火墙所遵循和组成的规则。这些规则存储在专用的信 息包过滤表中，而这些表集成在 Linux 内核中。在信息包过滤表中，规则被分组放在我们所谓的链（chain）中。
 
-<!-- /TOC -->
+虽然netfilter/iptables包过滤系统被称为单个实体，但它实际上由两个组件netfilter 和 iptables 组成。
 
-### 语法
+netfilter 组件也称为内核空间（kernelspace），是内核的一部分，由一些信息包过滤表组成，这些表包含内核用来控制信息包过滤处理的规则集。
 
-```shell
-iptables(选项)(参数)
-```
+iptables 组件是一种工具，也称为用户空间（userspace），它使插入、修改和除去信息包过滤表中的规则变得容易。
 
-### 选项
-
-```shell
--t, --table table 对指定的表 table 进行操作， table 必须是 raw， nat，filter，mangle 中的一个。如果不指定此选项，默认的是 filter 表。
-
-# 通用匹配：源地址目标地址的匹配
--p：指定要匹配的数据包协议类型；
--s, --source [!] address[/mask] ：把指定的一个／一组地址作为源地址，按此规则进行过滤。当后面没有 mask 时，address 是一个地址，比如：192.168.1.1；当 mask 指定时，可以表示一组范围内的地址，比如：192.168.1.0/255.255.255.0。
--d, --destination [!] address[/mask] ：地址格式同上，但这里是指定地址为目的地址，按此进行过滤。
--i, --in-interface [!] <网络接口name> ：指定数据包的来自来自网络接口，比如最常见的 eth0 。注意：它只对 INPUT，FORWARD，PREROUTING 这三个链起作用。如果没有指定此选项， 说明可以来自任何一个网络接口。同前面类似，"!" 表示取反。
--o, --out-interface [!] <网络接口name> ：指定数据包出去的网络接口。只对 OUTPUT，FORWARD，POSTROUTING 三个链起作用。
-
-# 查看管理命令
--L, --list [chain] 列出链 chain 上面的所有规则，如果没有指定链，列出表上所有链的所有规则。
-
-# 规则管理命令
--A, --append chain rule-specification 在指定链 chain 的末尾插入指定的规则，也就是说，这条规则会被放到最后，最后才会被执行。规则是由后面的匹配来指定。
--I, --insert chain [rulenum] rule-specification 在链 chain 中的指定位置插入一条或多条规则。如果指定的规则号是1，则在链的头部插入。这也是默认的情况，如果没有指定规则号。
--D, --delete chain rule-specification -D, --delete chain rulenum 在指定的链 chain 中删除一个或多个指定规则。
--R num：Replays替换/修改第几条规则
-
-# 链管理命令（这都是立即生效的）
--P, --policy chain target ：为指定的链 chain 设置策略 target。注意，只有内置的链才允许有策略，用户自定义的是不允许的。
--F, --flush [chain] 清空指定链 chain 上面的所有规则。如果没有指定链，清空该表上所有链的所有规则。
--N, --new-chain chain 用指定的名字创建一个新的链。
--X, --delete-chain [chain] ：删除指定的链，这个链必须没有被其它任何规则引用，而且这条上必须没有任何规则。如果没有指定链名，则会删除该表中所有非内置的链。
--E, --rename-chain old-chain new-chain ：用指定的新名字去重命名指定的链。这并不会对链内部造成任何影响。
--Z, --zero [chain] ：把指定链，或者表中的所有链上的所有计数器清零。
-
--j, --jump target <指定目标> ：即满足某条件时该执行什么样的动作。target 可以是内置的目标，比如 ACCEPT，也可以是用户自定义的链。
--h：显示帮助信息；
-```
-
-## 基本参数
-
-| 参数 | 作用 |
-| ---- | ---- |
-| -P |  设置默认策略:iptables -P INPUT (DROP|ACCEPT) |
-| -F |  清空规则链 |
-| -L |  查看规则链 |
-| -A |  在规则链的末尾加入新规则 |
-| -I | num  在规则链的头部加入新规则 |
-| -D | num  删除某一条规则 |
-| -s |  匹配来源地址IP/MASK，加叹号"!"表示除这个IP外。 |
-| -d |  匹配目标地址 |
-| -i | 网卡名称 匹配从这块网卡流入的数据 |
-| -o | 网卡名称 匹配从这块网卡流出的数据 |
-| -p |  匹配协议,如tcp,udp,icmp |
-| --dport num | 匹配目标端口号 |
-| --sport num | 匹配来源端口号 |
-
-#### 命令选项输入顺序
-
-```shell
-iptables -t 表名 <-A/I/D/R> 规则链名 [规则号] <-i/o 网卡名> -p 协议名 <-s 源IP/源子网> --sport 源端口 <-d 目标IP/目标子网> --dport 目标端口 -j 动作
-```
-
-#### 工作机制
-
-规则链名包括(也被称为五个钩子函数（hook functions）)：
-
-- **INPUT链** ：处理输入数据包。
-- **OUTPUT链** ：处理输出数据包。
-- **FORWARD链** ：处理转发数据包。
-- **PREROUTING链** ：用于目标地址转换（DNAT）。
-- **POSTOUTING链** ：用于源地址转换（SNAT）。
-
-#### 防火墙的策略
-
-防火墙策略一般分为两种，一种叫`通`策略，一种叫`堵`策略，通策略，默认门是关着的，必须要定义谁能进。堵策略则是，大门是洞开的，但是你必须有身份认证，否则不能进。所以我们要定义，让进来的进来，让出去的出去，`所以通，是要全通，而堵，则是要选择`。当我们定义的策略的时候，要分别定义多条功能，其中：定义数据包中允许或者不允许的策略，filter过滤的功能，而定义地址转换的功能的则是nat选项。为了让这些功能交替工作，我们制定出了“表”这个定义，来定义、区分各种不同的工作功能和处理方式。
-
-我们现在用的比较多个功能有3个：
-
-1. filter 定义允许或者不允许的，只能做在3个链上：INPUT ，FORWARD ，OUTPUT
-2. nat 定义地址转换的，也只能做在3个链上：PREROUTING ，OUTPUT ，POSTROUTING
-3. mangle功能:修改报文原数据，是5个链都可以做：PREROUTING，INPUT，FORWARD，OUTPUT，POSTROUTING
-
-我们修改报文原数据就是来修改TTL的。能够实现将数据包的元数据拆开，在里面做标记/修改内容的。而防火墙标记，其实就是靠mangle来实现的。
-
-小扩展:
-
-- 对于filter来讲一般只能做在3个链上：INPUT ，FORWARD ，OUTPUT
-- 对于nat来讲一般也只能做在3个链上：PREROUTING ，OUTPUT ，POSTROUTING
-- 而mangle则是5个链都可以做：PREROUTING，INPUT，FORWARD，OUTPUT，POSTROUTING
-
-iptables/netfilter（这款软件）是工作在用户空间的，它可以让规则进行生效的，本身不是一种服务，而且规则是立即生效的。而我们iptables现在被做成了一个服务，可以进行启动，停止的。启动，则将规则直接生效，停止，则将规则撤销。
-
-iptables还支持自己定义链。但是自己定义的链，必须是跟某种特定的链关联起来的。在一个关卡设定，指定当有数据的时候专门去找某个特定的链来处理，当那个链处理完之后，再返回。接着在特定的链中继续检查。
-
-注意：规则的次序非常关键，`谁的规则越严格，应该放的越靠前`，而检查规则的时候，是按照从上往下的方式进行检查的。
-
-
-表名包括：
-
-- **raw** ：高级功能，如：网址过滤。
-- **mangle** ：数据包修改（QOS），用于实现服务质量。
-- **nat** ：地址转换，用于网关路由器。
-- **filter** ：包过滤，用于防火墙规则。
-
-动作包括：
-
-- **ACCEPT** ：接收数据包。
-- **DROP** ：丢弃数据包。
-- **REDIRECT** ：重定向、映射、透明代理。
-- **SNAT** ：源地址转换。
-- **DNAT** ：目标地址转换。
-- **MASQUERADE** ：IP伪装（NAT），用于ADSL。
-- **LOG** ：日志记录。
-- **SEMARK** : 添加SEMARK标记以供网域内强制访问控制（MAC）
+## 基本原理
 
 ```shell
                              ┏╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍┓
@@ -189,334 +52,426 @@ iptables还支持自己定义链。但是自己定义的链，必须是跟某种
                              ┗━━━━━━━━━━━━━━━┛
 ```
 
+1. 一个数据包进入网卡时，它首先进入PREROUTING链，内核根据数据包目的IP判断是否需要转发出去。
+2. 如果数据包就是进入本机的，它就会沿着图向下移动，到达INPUT链。数据包到了INPUT链后，任何进程都会收到它。本机上运行的程序可以发送数据包，这些数据包会经 过OUTPUT链，然后到达POSTROUTING链输出。
+3. 如果数据包是要转发出去的，且内核允许转发，数据包就会如图所示向右移动，经过 FORWARD链，然后到达POSTROUTING链输出。
 
-### 实例
+### **规则（rules）**
 
-#### 清空当前的所有规则和计数
+规则（rules）其实就是网络管理员预定义的条件，规则一般的定义为“如果数据包头符合这样的条件，就这样处理这个数据包”。规则存储在内核空间的信息包过滤表中，这些规则分别指定了源地址、目的地址、传输协议（如TCP、UDP、ICMP）和服务类型（如HTTP、FTP和SMTP）等。当数据包与规则匹配时，iptables就根据规则所定义的方法来处理这些数据包，如放行（accept）、拒绝（reject）和丢弃（drop）等。配置防火墙的主要工作就是添加、修改和删除这些规则。
 
-```shell
-iptables -F  # 清空所有的防火墙规则
-iptables -X  # 删除用户自定义的空链
-iptables -Z  # 清空计数
+### **链（chains）**
+
+链（chains）是数据包传播的路径，每一条链其实就是众多规则中的一个检查清单，每一条链中可以有一条或数条规则。当一个数据包到达一个链时，iptables就会从链中第一条规则开始检查，看该数据包是否满足规则所定义的条件。如果满足，系统就会根据该条规则所定义的方法处理该数据包；否则iptables将继续检查下一条规则，如果该数据包不符合链中任一条规则，iptables就会根据该链预先定义的默认策略来处理数据包。
+
+### **表（tables）**
+
+表（tables）提供特定的功能，iptables内置了4个表，即raw表、filter表、nat表和mangle表，分别用于实现包过滤，网络地址转换和包重构的功能。
+
+#### raw表
+
+只使用在PREROUTING链和OUTPUT链上,因为优先级最高，从而可以对收到的数据包在连接跟踪前进行处理。一但用户使用了RAW表,在 某个链上,RAW表处理完后,将跳过NAT表和 ip_conntrack处理,即不再做地址转换和数据包的链接跟踪处理了.
+
+#### filter表
+
+主要用于过滤数据包，该表根据系统管理员预定义的一组规则过滤符合条件的数据包。对于防火墙而言，主要利用在filter表中指定的规则来实现对数据包的过滤。Filter表是默认的表，如果没有指定哪个表，iptables 就默认使用filter表来执行所有命令，filter表包含了INPUT链（处理进入的数据包），RORWARD链（处理转发的数据包），OUTPUT链（处理本地生成的数据包）在filter表中只能允许对数据包进行接受，丢弃的操作，而无法对数据包进行更改
+
+#### nat表
+
+主要用于网络地址转换NAT，该表可以实现一对一，一对多，多对多等NAT 工作，iptables就是使用该表实现共享上网的，NAT表包含了PREROUTING链（修改即将到来的数据包），POSTROUTING链（修改即将出去的数据包），OUTPUT链（修改路由之前本地生成的数据包）
+
+#### mangle表
+
+主要用于对指定数据包进行更改，在内核版本2.4.18 后的linux版本中该表包含的链为：INPUT链（处理进入的数据包），RORWARD链（处理转发的数据包），OUTPUT链（处理本地生成的数据包）POSTROUTING链（修改即将出去的数据包），PREROUTING链（修改即将到来的数据包）
+
+## 命令格式
+
+iptables的命令格式较为复杂，一般的格式如下：
+
+```bash
+iptables [-t 表] 命令 匹配 操作
 ```
 
-#### 配置允许ssh端口连接
+### 表
 
-```shell
-iptables -A INPUT -s 192.168.1.0/24 -p tcp --dport 22 -j ACCEPT
-# 22为你的ssh端口， -s 192.168.1.0/24表示允许这个网段的机器来连接，其它网段的ip地址是登陆不了你的机器的。 -j ACCEPT表示接受这样的请求
+-t 表选项用于指定命令应用于哪个iptables内置表。
+
+内建的规则表有四个，分别是
+
+- raw
+- filter
+- nat
+- mangle
+
+当未指定规则表时，则一律视为是 filter。
+
+### 命令
+
+命令选项用于指定iptables的执行方式，包括插入规则，删除规则和添加规则，常用命令说明
+
+```
+-P  --policy        <链名>  定义默认策略
+-L  --list          <链名>  查看iptables规则列表
+-A  --append        <链名>  在规则列表的最后增加1条规则
+-I  --insert        <链名>  在指定的位置插入1条规则
+-D  --delete        <链名>  从规则列表中删除1条规则
+-R  --replace       <链名>  替换规则列表中的某条规则
+-F  --flush         <链名>  删除表中所有规则
+-Z  --zero          <链名>  将表中数据包计数器和流量计数器归零
+-X  --delete-chain  <链名>  删除自定义链
+-v  --verbose       <链名>  与-L他命令一起使用显示更多更详细的信息
 ```
 
-#### 允许本地回环地址可以正常使用
+### 匹配规则
 
-```shell
-iptables -A INPUT -i lo -j ACCEPT
-#本地圆环地址就是那个127.0.0.1，是本机上使用的,它进与出都设置为允许
-iptables -A OUTPUT -o lo -j ACCEPT
+匹配选项指定数据包与规则匹配所具有的特征，包括源地址，目的地址，传输协议和端口号。常用匹配规则如下
+
+```
+-i --in-interface    网络接口名>     指定数据包从哪个网络接口进入，
+-o --out-interface   网络接口名>     指定数据包从哪个网络接口输出
+-p ---proto          协议类型        指定数据包匹配的协议，如TCP、UDP和ICMP等
+-s --source          源地址或子网>   指定数据包匹配的源地址
+   --sport           源端口号>       指定数据包匹配的源端口号
+   --dport           目的端口号>     指定数据包匹配的目的端口号
+-m --match           匹配的模块      指定数据包规则所使用的过滤模块
 ```
 
-#### 设置默认的规则
+iptables执行规则时，是从规则表中从上至下顺序执行的，如果没遇到匹配的规则，就一条一条往下执行，如果遇到匹配的规则后，那么就执行本规则，执行后根据本规则的动作(accept，reject，log，drop等)，决定下一步执行的情况，后续执行一般有三种情况。
 
-```shell
-iptables -P INPUT DROP # 配置默认的不让进
-iptables -P FORWARD DROP # 默认的不允许转发
-iptables -P OUTPUT ACCEPT # 默认的可以出去
+- 一种是继续执行当前规则队列内的下一条规则。比如执行过Filter队列内的LOG后，还会执行Filter队列内的下一条规则。
+- 一种是中止当前规则队列的执行，转到下一条规则队列。比如从执行过accept后就中断Filter队列内其它规则，跳到nat队列规则去执行
+- 一种是中止所有规则队列的执行。
+
+### 动作
+
+前面我们说过iptables处理动作除了 ACCEPT、REJECT、DROP、REDIRECT 、MASQUERADE 以外，还多出 LOG、ULOG、DNAT、RETURN、TOS、SNAT、MIRROR、QUEUE、TTL、MARK等。我们只说明其中最常用的动作：
+
+**REJECT** 拦阻该数据包，并返回数据包通知对方，可以返回的数据包有几个选择：ICMP port-unreachable、ICMP echo-reply 或是tcp-reset（这个数据包包会要求对方关闭联机），进行完此处理动作后，将不再比对其它规则，直接中断过滤程序。 范例如下：
+
+```
+iptables -A  INPUT -p TCP --dport 22 -j REJECT --reject-with ICMP echo-reply
 ```
 
-#### 配置白名单
+**DROP** 丢弃数据包不予处理，进行完此处理动作后，将不再比对其它规则，直接中断过滤程序。
 
-```shell
-iptables -A INPUT -p all -s 192.168.1.0/24 -j ACCEPT  # 允许机房内网机器可以访问
-iptables -A INPUT -p all -s 192.168.140.0/24 -j ACCEPT  # 允许机房内网机器可以访问
-iptables -A INPUT -p tcp -s 183.121.3.7 --dport 3380 -j ACCEPT # 允许183.121.3.7访问本机的3380端口
+**REDIRECT** 将封包重新导向到另一个端口（PNAT），进行完此处理动作后，将会继续比对其它规则。这个功能可以用来实作透明代理 或用来保护web 服务器。例如：
+
+```
+iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT--to-ports 8081
 ```
 
-#### 开启相应的服务端口
+**MASQUERADE** 改写封包来源IP为防火墙的IP，可以指定port 对应的范围，进行完此处理动作后，直接跳往下一个规则链（mangle:postrouting）。这个功能与 SNAT 略有不同，当进行IP 伪装时，不需指定要伪装成哪个 IP，IP 会从网卡直接读取，当使用拨接连线时，IP 通常是由 ISP 公司的 DHCP服务器指派的，这个时候 MASQUERADE 特别有用。范例如下：
 
-```shell
-iptables -A INPUT -p tcp --dport 80 -j ACCEPT # 开启80端口，因为web对外都是这个端口
-iptables -A INPUT -p icmp --icmp-type 8 -j ACCEPT # 允许被ping
-iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT # 已经建立的连接得让它进来
+```
+iptables -t nat -A POSTROUTING -p TCP -j MASQUERADE --to-ports 21000-31000
 ```
 
-#### 保存规则到配置文件中
+**LOG** 将数据包相关信息纪录在 /var/log 中，详细位置请查阅 /etc/syslog.conf 配置文件，进行完此处理动作后，将会继续比对其它规则。例如：
 
-```shell
-cp /etc/sysconfig/iptables /etc/sysconfig/iptables.bak # 任何改动之前先备份，请保持这一优秀的习惯
-iptables-save > /etc/sysconfig/iptables
-cat /etc/sysconfig/iptables
+```
+iptables -A INPUT -p tcp -j LOG --log-prefix "input packet"
 ```
 
-#### 列出已设置的规则
+**SNAT** 改写封包来源 IP 为某特定 IP 或 IP 范围，可以指定 port 对应的范围，进行完此处理动作后，将直接跳往下一个规则炼（mangle:postrouting）。范例如下：
 
-> iptables -L [-t 表名] [链名]
+```
+iptables -t nat -A POSTROUTING -p tcp-o eth0 -j SNAT --to-source 192.168.10.15-192.168.10.160:2100-3200
+```
 
-- 四个表名 `raw`，`nat`，`filter`，`mangle`
-- 五个规则链名 `INPUT`、`OUTPUT`、`FORWARD`、`PREROUTING`、`POSTROUTING`
-- filter表包含`INPUT`、`OUTPUT`、`FORWARD`三个规则链
+**DNAT** 改写数据包包目的地 IP 为某特定 IP 或 IP 范围，可以指定 port 对应的范围，进行完此处理动作后，将会直接跳往下一个规则链（filter:input 或 filter:forward）。范例如下：
 
-```shell
-iptables -L -t nat                  # 列出 nat 上面的所有规则
-#            ^ -t 参数指定，必须是 raw， nat，filter，mangle 中的一个
-iptables -L -t nat  --line-numbers  # 规则带编号
+```
+iptables -t nat -A PREROUTING -p tcp -d 15.45.23.67 --dport 80 -j DNAT --to-destination 192.168.10.1-192.168.10.10:80-100
+```
+
+**MIRROR** 镜像数据包，也就是将来源 IP与目的地IP对调后，将数据包返回，进行完此处理动作后，将会中断过滤程序。
+
+**QUEUE** 中断过滤程序，将封包放入队列，交给其它程序处理。透过自行开发的处理程序，可以进行其它应用，例如：计算联机费用.......等。
+
+**RETURN** 结束在目前规则链中的过滤程序，返回主规则链继续过滤，如果把自订规则炼看成是一个子程序，那么这个动作，就相当于提早结束子程序并返回到主程序中。
+
+**MARK** 将封包标上某个代号，以便提供作为后续过滤的条件判断依据，进行完此处理动作后，将会继续比对其它规则。范例如下：
+
+```
+iptables -t mangle -A PREROUTING -p tcp --dport 22 -j MARK --set-mark 22
+```
+
+看了本文是不是对iptables参数有所了解了，下文我会使用实例来更详细的说明iptables的参数的用法。
+
+## 示例
+
+### 常用命令示例
+
+1、命令 -A, --append
+
+```bash
+iptables -A INPUT -p tcp --dport 80 -j ACCEPT
+```
+
+说明 ：新增规则到INPUT规则链中，规则时接到所有目的端口为80的数据包的流入连接，该规则将会成为规则链中的最后一条规则。
+
+2、命令 -D, --delete
+
+```bash
+iptables -D INPUT -p tcp --dport 80 -j ACCEPT
+
+或
+
+iptables -D INPUT 1
+```
+
+说明： 从INPUT规则链中删除上面建立的规则，可输入完整规则，或直接指定规则编号加以删除。
+
+3、命令 -R, --replace
+
+```bash
+iptables -R INPUT 1 -s 192.168.0.1 -j DROP
+```
+
+说明 取代现行第一条规则，规则被取代后并不会改变顺序。
+
+4、命令 -I, --insert
+
+```bash
+iptables -I INPUT 1 -p tcp --dport 80 -j ACCEPT
+```
+
+说明： 在第一条规则前插入一条规则，原本该位置上的规则将会往后移动一个顺位。
+
+5、命令 -L, --list
+
+```bash
 iptables -L INPUT
-
-iptables -L -nv  # 查看，这个列表看起来更详细
 ```
 
-#### 清除已有规则
+说明：列出INPUT规则链中的所有规则。
 
-```shell
-iptables -F INPUT  # 清空指定链 INPUT 上面的所有规则
-iptables -X INPUT  # 删除指定的链，这个链必须没有被其它任何规则引用，而且这条上必须没有任何规则。
-                   # 如果没有指定链名，则会删除该表中所有非内置的链。
-iptables -Z INPUT  # 把指定链，或者表中的所有链上的所有计数器清零。
+6、命令 -F, --flush
+
+```bash
+iptables -F INPUT
 ```
 
-#### 删除已添加的规则
+说明： 删除INPUT规则链中的所有规则。
 
-```shell
-# 添加一条规则
-iptables -A INPUT -s 192.168.1.5 -j DROP
+7、命令 -Z, --zeroLINUX教程 centos教程
+
+```bash
+iptables -Z INPUT
 ```
 
-将所有iptables以序号标记显示，执行：
+说明 将INPUT链中的数据包计数器归零。它是计算同一数据包出现次数，过滤阻断式攻击不可少的工具。
 
-```shell
-iptables -L -n --line-numbers
+8、命令 -N, --new-chain
+
+```bash
+iptables -N denied
 ```
 
-比如要删除INPUT里序号为8的规则，执行：
+说明： 定义新的规则链。
 
-```shell
-iptables -D INPUT 8
+9、命令 -X, --delete-chain
+
+```bash
+iptables -X denied
 ```
 
-#### 开放指定的端口
+说明： 删除某个规则链。
 
-```shell
-iptables -A INPUT -s 127.0.0.1 -d 127.0.0.1 -j ACCEPT               #允许本地回环接口(即运行本机访问本机)
-iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT    #允许已建立的或相关连的通行
-iptables -A OUTPUT -j ACCEPT         #允许所有本机向外的访问
-iptables -A INPUT -p tcp --dport 22 -j ACCEPT    #允许访问22端口
-iptables -A INPUT -p tcp --dport 80 -j ACCEPT    #允许访问80端口
-iptables -A INPUT -p tcp --dport 21 -j ACCEPT    #允许ftp服务的21端口
-iptables -A INPUT -p tcp --dport 20 -j ACCEPT    #允许FTP服务的20端口
-iptables -A INPUT -j reject       #禁止其他未允许的规则访问
-iptables -A FORWARD -j REJECT     #禁止其他未允许的规则访问
+10、命令 -P, --policy
+
+```bash
+iptables -P INPUT DROP
 ```
 
-#### 屏蔽IP
+说明 ：定义默认的过滤策略。 数据包没有找到符合的策略，则根据此预设方式处理。
 
-```shell
-iptables -A INPUT -p tcp -m tcp -s 192.168.0.8 -j DROP  # 屏蔽恶意主机（比如，192.168.0.8
-iptables -I INPUT -s 123.45.6.7 -j DROP       #屏蔽单个IP的命令
-iptables -I INPUT -s 123.0.0.0/8 -j DROP      #封整个段即从123.0.0.1到123.255.255.254的命令
-iptables -I INPUT -s 124.45.0.0/16 -j DROP    #封IP段即从123.45.0.1到123.45.255.254的命令
-iptables -I INPUT -s 123.45.6.0/24 -j DROP    #封IP段即从123.45.6.1到123.45.6.254的命令是
+11、命令 -E, --rename-chain
+
+```bash
+iptables -E denied disallowed
 ```
 
-#### 指定数据包出去的网络接口
+说明： 修改某自订规则链的名称。
 
-只对 OUTPUT，FORWARD，POSTROUTING 三个链起作用。
+### 常用封包比对参数
 
-```shell
+1、参数 -p, --protocol
+
+```bash
+iptables -A INPUT -p tcpLINUX教程 centos教程
+```
+
+说明：比对通讯协议类型是否相符，可以使用 ! 运算子进行反向比对，例如：-p ! tcp ，意思是指除 tcp 以外的其它类型，包含udp、icmp ...等。如果要比对所有类型，则可以使用 all 关键词，例如：-p all。
+
+2、参数 -s, --src, --source
+
+```bash
+iptables -A INPUT -s 192.168.1.100
+```
+
+说明：用来比对数据包的来源IP，可以比对单机或网络，比对网络时请用数字来表示屏蔽，例如：-s 192.168.0.0/24，比对 IP 时可以使用!运算子进行反向比对，例如：-s ! 192.168.0.0/24。
+
+3、参数 -d, --dst, --destination
+
+```bash
+iptables -A INPUT -d 192.168.1.100
+```
+
+说明：用来比对封包的目的地 IP，设定方式同上。
+
+4、参数 -i, --in-interface
+
+```bash
+iptables -A INPUT -i lo
+```
+
+说明:用来比对数据包是从哪个网卡进入，可以使用通配字符 + 来做大范围比对，如：-i eth+ 表示所有的 ethernet 网卡，也可以使用 ! 运算子进行反向比对，如：-i ! eth0。这里lo指本地换回接口。
+
+5、参数 -o, --out-interface
+
+```bash
 iptables -A FORWARD -o eth0
 ```
 
-#### 查看已添加的规则
+说明：用来比对数据包要从哪个网卡流出，设定方式同上。
 
-```shell
-iptables -L -n -v
-Chain INPUT (policy DROP 48106 packets, 2690K bytes)
- pkts bytes target     prot opt in     out     source               destination
- 5075  589K ACCEPT     all  --  lo     *       0.0.0.0/0            0.0.0.0/0
- 191K   90M ACCEPT     tcp  --  *      *       0.0.0.0/0            0.0.0.0/0           tcp dpt:22
-1499K  133M ACCEPT     tcp  --  *      *       0.0.0.0/0            0.0.0.0/0           tcp dpt:80
-4364K 6351M ACCEPT     all  --  *      *       0.0.0.0/0            0.0.0.0/0           state RELATED,ESTABLISHED
- 6256  327K ACCEPT     icmp --  *      *       0.0.0.0/0            0.0.0.0/0
+6、参数 --sport, --source-port
 
-Chain FORWARD (policy ACCEPT 0 packets, 0 bytes)
- pkts bytes target     prot opt in     out     source               destination
-
-Chain OUTPUT (policy ACCEPT 3382K packets, 1819M bytes)
- pkts bytes target     prot opt in     out     source               destination
- 5075  589K ACCEPT     all  --  *      lo      0.0.0.0/0            0.0.0.0/0
+```bash
+iptables -A INPUT -p tcp --sport 22
 ```
 
-#### 启动网络转发规则
+说明：用来比对数据的包的来源端口号，可以比对单一端口，或是一个范围，例如：--sport 22:80，表示从 22 到 80 端口之间都算是符合件，如果要比对不连续的多个端口，则必须使用 --multiport 参数，详见后文。比对端口号时，可以使用 ! 运算子进行反向比对。
 
-公网`210.14.67.7`让内网`192.168.188.0/24`上网
+7、参数 --dport, --destination-port
 
-```shell
-iptables -t nat -A POSTROUTING -s 192.168.188.0/24 -j SNAT --to-source 210.14.67.127
+```bash
+iptables -A INPUT -p tcp --dport 22
 ```
 
-#### 端口映射
+说明 用来比对封包的目的地端口号，设定方式同上。
 
-本机的 2222 端口映射到内网 虚拟机的22 端口
+8、参数 --tcp-flags
 
-```shell
-iptables -t nat -A PREROUTING -d 210.14.67.127 -p tcp --dport 2222  -j DNAT --to-dest 192.168.188.115:22
+```bash
+iptables -p tcp --tcp-flags SYN,FIN,ACK SYN
 ```
 
-#### 字符串匹配
+说明：比对 TCP 封包的状态标志号，参数分为两个部分，第一个部分列举出想比对的标志号，第二部分则列举前述标志号中哪些有被设，未被列举的标志号必须是空的。TCP 状态标志号包括：SYN（同步）、ACK（应答）、FIN（结束）、RST（重设）、URG（紧急）PSH（强迫推送） 等均可使用于参数中，除此之外还可以使用关键词 ALL 和 NONE 进行比对。比对标志号时，可以使用 ! 运算子行反向比对。
 
-比如，我们要过滤所有TCP连接中的字符串`test`，一旦出现它我们就终止这个连接，我们可以这么做：
+9、参数 --syn
 
-```shell
-iptables -A INPUT -p tcp -m string --algo kmp --string "test" -j REJECT --reject-with tcp-reset
-iptables -L
-
-# Chain INPUT (policy ACCEPT)
-# target     prot opt source               destination
-# REJECT     tcp  --  anywhere             anywhere            STRING match "test" ALGO name kmp TO 65535 reject-with tcp-reset
-#
-# Chain FORWARD (policy ACCEPT)
-# target     prot opt source               destination
-#
-# Chain OUTPUT (policy ACCEPT)
-# target     prot opt source               destination
+```bash
+iptables -p tcp --syn
 ```
 
-#### 阻止Windows蠕虫的攻击
+说明：用来比对是否为要求联机之TCP 封包，与 iptables -p tcp --tcp-flags SYN,FIN,ACK SYN 的作用完全相同，如果使用 !运算子，可用来比对非要求联机封包。
 
-```shell
-iptables -I INPUT -j DROP -p tcp -s 0.0.0.0/0 -m string --algo kmp --string "cmd.exe"
+10、参数 -m multiport --source-port
+
+```bash
+iptables -A INPUT -p tcp -m multiport --source-port 22,53,80,110 -j ACCEPT
 ```
 
-#### 防止SYN洪水攻击
+说明 用来比对不连续的多个来源端口号，一次最多可以比对 15 个端口，可以使用 ! 运算子进行反向比对。
 
-```shell
-iptables -A INPUT -p tcp --syn -m limit --limit 5/second -j ACCEPT
+11、参数 -m multiport --destination-port
+
+```bash
+iptables -A INPUT -p tcp -m multiport --destination-port 22,53,80,110 -j ACCEPT
 ```
 
-#### 添加SECMARK记录
-```shell
-iptables -t mangle -A INPUT -p tcp --src 192.168.1.2 --dport 443 -j SECMARK --selctx system_u:object_r:myauth_packet_t
-# 向从 192.168.1.2:443 以TCP方式发出到本机的包添加MAC安全上下文 system_u:object_r:myauth_packet_t
+说明：用来比对不连续的多个目的地端口号，设定方式同上。
+
+12、参数 -m multiport --port
+
+```bash
+iptables -A INPUT -p tcp -m multiport --port 22,53,80,110 -j ACCEPT
 ```
 
-## 更多实例
-> 用iptables搭建一套强大的安全防护盾 http://www.imooc.com/learn/389
+说明：这个参数比较特殊，用来比对来源端口号和目的端口号相同的数据包，设定方式同上。注意：在本范例中，如果来源端口号为 80，目的地端口号为 110，这种数据包并不算符合条件。
 
-iptables: linux 下应用层防火墙工具
+13、参数 --icmp-type
 
-iptables 5链: 对应 Hook point
-netfilter: linux 操作系统核心层内部的一个数据包处理模块
-Hook point: 数据包在 netfilter 中的挂载点; `PRE_ROUTING / INPUT / OUTPUT / FORWARD / POST_ROUTING`
-
-iptables & netfilter
-![](http://7xq89b.com1.z0.glb.clouddn.com/netfilter&iptables.jpg)
-
-iptables 4表5链
-![](http://7xq89b.com1.z0.glb.clouddn.com/iptables-data-stream.jpg)
-
-iptables rules
-![](http://7xq89b.com1.z0.glb.clouddn.com/iptables-rules.jpg)
-
-- 4表
-
-**filter**: 访问控制 / 规则匹配
-**nat**: 地址转发
- mangle / raw
-
- - 规则
-
-数据访问控制: ACCEPT / DROP / REJECT
-数据包改写(nat -> 地址转换): snat / dnat
-信息记录: log
-
-## 使用场景实例
-- 场景一
-
-开放 tcp 10-22/80 端口
-开放 icmp
-其他未被允许的端口禁止访问
-
-存在的问题: 本机无法访问本机; 本机无法访问其他主机
-
-- 场景二
-
-ftp: 默认被动模式(服务器产生随机端口告诉客户端, 客户端主动连接这个端口拉取数据)
-vsftpd: 使 ftp 支持主动模式(客户端产生随机端口通知服务器, 服务器主动连接这个端口发送数据)
-
-- 场景三
-
-允许外网访问:
-web
-http -> 80/tcp; https -> 443/tcp
-mail
-smtp -> 25/tcp; smtps -> 465/tcp
-pop3 -> 110/tcp; pop3s -> 995/tcp
-imap -> 143/tcp
-
-内部使用:
-file
-nfs -> 123/udp
-samba -> 137/138/139/445/tcp
-ftp -> 20/21/tcp
-remote
-ssh -> 22/tcp
-sql
-mysql -> 3306/tcp
-oracle -> 1521/tcp
-
-- 场景四
-
-nat 转发
-
-- 场景五
-
-防CC攻击
-
-```shell
-iptables -L -F -A -D # list flush append delete
-# 场景一
-iptables -I INPUT -p tcp --dport 80 -j ACCEPT # 允许 tcp 80 端口
-iptables -I INPUT -p tcp --dport 10:22 -j ACCEPT # 允许 tcp 10-22 端口
-iptables -I INPUT -p icmp -j ACCEPT # 允许 icmp
-iptables -A INPUT -j REJECT # 添加一条规则, 不允许所有
-
-# 优化场景一
-iptables -I INPUT -i lo -j ACCEPT # 允许本机访问
-iptables -I INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT # 允许访问外网
-iptables -I INPUT -p tcp --dport 80 -s 10.10.188.233 -j ACCEPT # 只允许固定ip访问80
-
-# 场景二
-vi /etc/vsftpd/vsftpd.conf # 使用 vsftpd 开启 ftp 主动模式
-port_enable=yes
-connect_from_port_20=YES
-iptables -I INPUT -p tcp --dport 21 -j ACCEPT
-
-vi /etc/vsftpd/vsftpd.conf # 建议使用 ftp 被动模式
-pasv_min_port=50000
-pasv_max_port=60000
-iptables -I INPUT -p tcp --dport 21 -j ACCEPT
-iptables -I INPUT -p tcp --dport 50000:60000 -j ACCEPT
-
-# 还可以使用 iptables 模块追踪来自动开发对应的端口
-
-# 场景三
-iptables -I INPUT -i lo -j ACCEPT # 允许本机访问
-iptables -I INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT # 允许访问外网
-iptables -I INPUT -s 10.10.155.0/24 -j ACCEPT # 允许内网访问
-iptables -I INPUT -p tcp -m multiport --dports 80,1723 -j ACCEPT # 允许端口, 80 -> http, 1723 -> vpn
-iptables -A INPUT -j REJECT # 添加一条规则, 不允许所有
-
-iptables-save # 保存设置到配置文件
-
-# 场景四
-iptables -t nat -L # 查看 nat 配置
-
-iptables -t nat -A POST_ROUTING -s 10.10.177.0/24 -j SNAT --to 10.10.188.232 # SNAT
-vi /etc/sysconfig/network # 配置网关
-
-iptables -t nat -A POST_ROUTING -d 10.10.188.232 -p tcp --dport 80 -j DNAT --to 10.10.177.232:80 # DNAT
-
-#场景五
-iptables -I INPUT -p tcp --syn --dport 80 -m connlimit --connlimit-above 100 -j REJECT # 限制并发连接访问数
-iptables -I INPUT -m limit --limit 3/hour --limit-burst 10 -j ACCEPT # limit模块; --limit-burst 默认为5
+```bash
+iptables -A INPUT -p icmp --icmp-type 8 -j DROP
 ```
 
+说明：用来比对 ICMP 的类型编号，可以使用代码或数字编号来进行比对。请打 iptables -p icmp --help 来查看有哪些代码可用。这里是指禁止ping如，但是可以从该主机ping出。
 
+14、参数 -m limit --limit
+
+```bash
+iptables -A INPUT -m limit --limit 3/hour
+```
+
+说明：用来比对某段时间内数据包的平均流量，上面的例子是用来比对：每小时平均流量是否超过一次3个数据包。 除了每小时平均次外，也可以每秒钟、每分钟或每天平均一次，默认值为每小时平均一次，参数如后： /second、 /minute、/day。 除了进行数据包数量的比对外，设定这个参数也会在条件达成时，暂停数据包的比对动作，以避免因洪水攻击法，导致服务被阻断。
+
+15、参数 --limit-burst
+
+```bash
+iptables -A INPUT -m limit --limit-burst 5
+```
+
+说明：用来比对瞬间大量封包的数量，上面的例子是用来比对一次同时涌入的封包是否超过 5 个（这是默认值），超过此上限的封将被直接丢弃。使用效果同上。
+
+16、参数 -m mac --mac-source
+
+```bash
+iptables -A INPUT -m mac --mac-source 00:00:00:00:00:01 -j ACCEPT
+```
+
+说明：用来比对数据包来源网络接口的硬件地址，这个参数不能用在 OUTPUT 和 Postrouting 规则链上，这是因为封包要送出到网后，才能由网卡驱动程序透过 ARP 通讯协议查出目的地的 MAC 地址，所以 iptables 在进行封包比对时，并不知道封包会送到个网络接口去。linux基础
+
+17、参数 --mark
+
+```bash
+iptables -t mangle -A INPUT -m mark --mark 1
+```
+
+说明：用来比对封包是否被表示某个号码，当封包被比对成功时，我们可以透过 MARK 处理动作，将该封包标示一个号码，号码最不可以超过 4294967296。linux基础
+
+18、参数 -m owner --uid-owner
+
+```bash
+iptables -A OUTPUT -m owner --uid-owner 500
+```
+
+说明：用来比对来自本机的封包，是否为某特定使用者所产生的，这样可以避免服务器使用 root 或其它身分将敏感数据传送出，可以降低系统被骇的损失。可惜这个功能无法比对出来自其它主机的封包。
+
+19、参数 -m owner --gid-owner
+
+```bash
+iptables -A OUTPUT -m owner --gid-owner 0
+```
+
+说明：用来比对来自本机的数据包，是否为某特定使用者群组所产生的，使用时机同上。
+
+20、参数 -m owner --pid-owner
+
+```bash
+iptables -A OUTPUT -m owner --pid-owner 78
+```
+
+说明：用来比对来自本机的数据包，是否为某特定行程所产生的，使用时机同上。
+
+21、参数 -m owner --sid-owner
+
+```bash
+iptables -A OUTPUT -m owner --sid-owner 100
+```
+
+说明： 用来比对来自本机的数据包，是否为某特定联机（Session ID）的响应封包，使用时机同上。
+
+22、参数 -m state --state
+
+```bash
+iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+```
+
+说明 用来比对联机状态，联机状态共有四种：INVALID、ESTABLISHED、NEW 和 RELATED。
+
+23、iptables -L -n -v 可以查看计数器
+
+INVALID 表示该数据包的联机编号（Session ID）无法辨识或编号不正确。ESTABLISHED 表示该数据包属于某个已经建立的联机。NEW 表示该数据包想要起始一个联机（重设联机或将联机重导向）。RELATED 表示该数据包是属于某个已经建立的联机，所建立的新联机。例如：FTP-DATA 联机必定是源自某个 FTP 联机。

@@ -1,24 +1,52 @@
 ss
 ===
 
-比 netstat 好用的socket统计信息，iproute2 包附带的另一个工具，允许你查询 socket 的有关统计信息
+比 netstat 更高效好用的 socket 统计信息工具
 
 ## 补充说明
 
 **ss命令** 用来显示处于活动状态的套接字信息。ss命令可以用来获取socket统计信息，它可以显示和netstat类似的内容。但ss的优势在于它能够显示更多更详细的有关TCP和连接状态的信息，而且比netstat更快速更高效。
 
-当服务器的socket连接数量变得非常大时，无论是使用netstat命令还是直接`cat /proc/net/tcp`，执行速度都会很慢。可能你不会有切身的感受，但请相信我，当服务器维持的连接达到上万个的时候，使用netstat等于浪费 生命，而用ss才是节省时间。
+当服务器的socket连接数量变得非常大时，无论是使用netstat命令还是直接`cat /proc/net/tcp`，执行速度都会很慢。而ss快的秘诀在于，它利用到了TCP协议栈中tcp_diag。tcp_diag是一个用于分析统计的模块，可以获得Linux 内核中第一手的信息，这就确保了ss的快捷高效。当然，如果你的系统中没有tcp_diag，ss也可以正常运行，只是效率会变得稍慢。
 
-天下武功唯快不破。ss快的秘诀在于，它利用到了TCP协议栈中tcp_diag。tcp_diag是一个用于分析统计的模块，可以获得Linux 内核中第一手的信息，这就确保了ss的快捷高效。当然，如果你的系统中没有tcp_diag，ss也可以正常运行，只是效率会变得稍慢。
+## 适用的Linux版本
 
-### 语法
+ss 命令适用于几乎所有现代 Linux 发行版，通常包含在 iproute2 包中。如果系统上未安装 ss 命令，可以通过以下命令进行安装：
 
 ```shell
-ss [参数]
-ss [参数] [过滤]
+# 基于apt的发行版（如Debian、Ubuntu、Raspbian、Kali Linux等）
+$ sudo apt-get update && sudo apt-get install iproute2
+
+# 基于yum的发行版（如RedHat，CentOS 7等）
+$ sudo yum update && sudo yum install iproute
+
+# 基于dnf的发行版（如Fedora，CentOS 8等）
+$ sudo dnf update && sudo dnf install iproute
+
+# 基于apk的发行版（如Alpine Linux）
+$ sudo apk add --update iproute2
+
+# 基于pacman的发行版（如Arch Linux）
+$ sudo pacman -Syu && sudo pacman -S iproute2
+
+# 基于zypper的发行版（如openSUSE）
+$ sudo zypper ref && sudo zypper in iproute2
+
+# 基于pkg的FreeBSD发行版
+$ sudo pkg update && sudo pkg install iproute2
+
+# 基于pkg的OS X/macOS发行版
+$ brew update && brew install iproute2
 ```
 
-### 选项
+## 命令语法
+
+```shell
+ss [OPTIONS]
+ss [OPTIONS] [FILTER]
+```
+
+## 选项
 
 ```shell
 -h, --help      帮助信息
@@ -29,7 +57,7 @@ ss [参数] [过滤]
 -l, --listening 显示监听状态的套接字（sockets）
 -o, --options   显示计时器信息
 -e, --extended  显示详细的套接字（sockets）信息
--m, --memory    显示套接字（socket）的内存使用情况
+-m, --memory    显示套接¬字（socket）的内存使用情况
 -p, --processes 显示使用套接字（socket）的进程
 -i, --info      显示 TCP内部信息
 -s, --summary   显示套接字（socket）使用概况
@@ -49,167 +77,96 @@ ss [参数] [过滤]
        FILTER := [ state TCP-STATE ] [ EXPRESSION ]
 ```
 
-### 实例
+## 示例
+
+### 实例1：列出所有打开的套接字
 
 ```shell
-ss -t -a    # 显示TCP连接
-ss -s       # 显示 Sockets 摘要
-ss -l       # 列出所有打开的网络连接端口
-ss -pl      # 查看进程使用的socket
-ss -lp | grep 3306  # 找出打开套接字/端口应用程序
-ss -u -a    显示所有UDP Sockets
-ss -o state established '( dport = :smtp or sport = :smtp )' # 显示所有状态为established的SMTP连接
-ss -o state established '( dport = :http or sport = :http )' # 显示所有状态为Established的HTTP连接
-ss -o state fin-wait-1 '( sport = :http or sport = :https )' dst 193.233.7/24  # 列举出处于 FIN-WAIT-1状态的源端口为 80或者 443，目标网络为 193.233.7/24所有 tcp套接字
-
-# ss 和 netstat 效率对比
-time netstat -at
-time ss
-
-# 匹配远程地址和端口号
-# ss dst ADDRESS_PATTERN
-ss dst 192.168.1.5
-ss dst 192.168.119.113:http
-ss dst 192.168.119.113:smtp
-ss dst 192.168.119.113:443
-
-# 匹配本地地址和端口号
-# ss src ADDRESS_PATTERN
-ss src 192.168.119.103
-ss src 192.168.119.103:http
-ss src 192.168.119.103:80
-ss src 192.168.119.103:smtp
-ss src 192.168.119.103:25
+$ ss -a
 ```
 
-**将本地或者远程端口和一个数比较**
+这条命令会显示系统中所有状态的套接字。
+
+### 实例2：列出所有TCP套接字
 
 ```shell
-# ss dport OP PORT 远程端口和一个数比较；
-# ss sport OP PORT 本地端口和一个数比较
-# OP 可以代表以下任意一个:
-# <= or le : 小于或等于端口号
-# >= or ge : 大于或等于端口号
-# == or eq : 等于端口号
-# != or ne : 不等于端口号
-# < or gt : 小于端口号
-# > or lt : 大于端口号
-ss  sport = :http
-ss  dport = :http
-ss  dport \> :1024
-ss  sport \> :1024
-ss sport \< :32000
-ss  sport eq :22
-ss  dport != :22
-ss  state connected sport = :http
-ss \( sport = :http or sport = :https \)
-ss -o state fin-wait-1 \( sport = :http or sport = :https \) dst 192.168.1/24
+$ ss -ta
 ```
 
-**用TCP 状态过滤Sockets**
+使用`-t`选项来只显示TCP套接字，结合`-a`选项可以查看所有TCP套接字的状态。
+
+### 实例3：列出所有监听状态的TCP端口
 
 ```shell
-ss -4 state closing
-# ss -4 state FILTER-NAME-HERE
-# ss -6 state FILTER-NAME-HERE
-# FILTER-NAME-HERE 可以代表以下任何一个：
-# established、 syn-sent、 syn-recv、 fin-wait-1、 fin-wait-2、 time-wait、 closed、 close-wait、 last-ack、 listen、 closing、
-# all : 所有以上状态
-# connected : 除了listen and closed的所有状态
-# synchronized :所有已连接的状态除了syn-sent
-# bucket : 显示状态为maintained as minisockets,如：time-wait和syn-recv.
-# big : 和bucket相反.
+$ ss -lt
 ```
 
- **显示ICP连接**
+加上`-l`选项，`ss`命令将显示当前系统上处于监听状态的 TCP 套接字。
+
+### 实例4：列出所有监听状态的UDP端口
 
 ```shell
-[root@localhost ~]# ss -t -a
-State       Recv-Q Send-Q                            Local Address:Port                                Peer Address:Port
-LISTEN      0      0                                             *:3306                                           *:*
-LISTEN      0      0                                             *:http                                           *:*
-LISTEN      0      0                                             *:ssh                                            *:*
-LISTEN      0      0                                     127.0.0.1:smtp                                           *:*
-ESTAB       0      0                                112.124.15.130:42071                              42.156.166.25:http
-ESTAB       0      0                                112.124.15.130:ssh                              121.229.196.235:33398
+$ ss -lu
 ```
 
- **显示 Sockets 摘要**
+使用`-u`选项来只显示UDP套接字，结合`-l`选项则仅显示监听状态的UDP端口。
+
+### 实例5：显示每个套接字的进程信息
 
 ```shell
-[root@localhost ~]# ss -s
-Total: 172 (kernel 189)
-TCP:   10 (estab 2, closed 4, orphaned 0, synrecv 0, timewait 0/0), ports 5
-
-Transport Total     ip        IPv6
-*         189       -         -
-RAW       0         0         0
-UDP       5         5         0
-TCP       6         6         0
-INET      11        11        0
-FRAG      0         0         0
+$ ss -lp
 ```
 
-列出当前的established, closed, orphaned and waiting TCP sockets
+`-p`选项用于显示每个套接字关联的进程信息。这对于确定哪个进程正在监听或使用特定端口非常有帮助。
 
- **列出所有打开的网络连接端口**
+### 实例6：查找监听特定端口（例如80端口）的进程
 
 ```shell
-[root@localhost ~]# ss -l
-Recv-Q Send-Q                                 Local Address:Port                                     Peer Address:Port
-0      0                                                  *:3306                                                *:*
-0      0                                                  *:http                                                *:*
-0      0                                                  *:ssh                                                 *:*
-0      0                                          127.0.0.1:smtp                                                *:*
+$ ss -lntp | grep ':80'
 ```
 
- **查看进程使用的socket**
+此命令组合使用了`-lnt`选项来列出所有TCP监听套接字并不解析服务名称，`-p`用于显示进程信息。然后通过`grep`命令过滤出监听80端口的记录。
+
+### 实例7：仅显示有关TCP套接字的统计信息
 
 ```shell
-[root@localhost ~]# ss -pl
-Recv-Q Send-Q                                          Local Address:Port                                              Peer Address:Port
-0      0                                                           *:3306                                                         *:*        users:(("mysqld",1718,10))
-0      0                                                           *:http                                                         *:*        users:(("nginx",13312,5),("nginx",13333,5))
-0      0                                                           *:ssh                                                          *:*        users:(("sshd",1379,3))
-0      0                                                   127.0.0.1:smtp                                                         *:*        us
+$ ss -s
 ```
 
- **找出打开套接字/端口应用程序**
+使用`-s`选项可以查看当前套接字的统计摘要。这包括不同类型套接字的总数、已建立的连接数、已关闭的连接数等。
+
+### 实例8：显示所有IPv4和IPv6的TCP和UDP套接字
 
 ```shell
-[root@localhost ~]# ss -pl | grep 3306
-0      0                            *:3306                          *:*        users:(("mysqld",1718,10))
+$ ss -tua -A inet,inet6
 ```
 
- **显示所有UDP Sockets**
+- `A`选项后面可以指定套接字地址族，`inet`对应IPv4，而`inet6`对应IPv6。结合`tua`可以列出所有TCP和UDP套接字。
+
+### 实例9：监控TCP套接字的状态变化
 
 ```shell
-[root@localhost ~]# ss -u -a
-State       Recv-Q Send-Q                                     Local Address:Port                                         Peer Address:Port
-UNCONN      0      0                                                      *:syslog                                                  *:*
-UNCONN      0      0                                         112.124.15.130:ntp                                                     *:*
-UNCONN      0      0                                            10.160.7.81:ntp                                                     *:*
-UNCONN      0      0                                              127.0.0.1:ntp                                                     *:*
-UNCONN      0      0                                                      *:ntp                                                     *:*
+$ watch -n 1 ss -tp
 ```
 
-**出所有端口为 22（ssh）的连接**
+`watch`命令可以用来周期性地执行`ss`命令。这个例子中，`-n 1`表示每1秒执行一次`ss -tp`，从而可以动态监控TCP套接字的状态变化。
+
+### 实例10：显示所有处于TIME-WAIT状态的TCP连接
 
 ```shell
-[root@localhost ~]# ss state all sport = :ssh
-Netid State      Recv-Q Send-Q     Local Address:Port                      Peer Address:Port
-tcp   LISTEN     0      128                    *:ssh                                  *:*
-tcp   ESTAB      0      0          192.168.0.136:ssh                      192.168.0.102:46540
-tcp   LISTEN     0      128                   :::ssh                                 :::*
+$ ss -o state time-wait
 ```
 
-**查看TCP的连接状态**
+使用`-o`选项可以显示计时器信息，而`state time-wait`过滤条件可以筛选出所有处于TIME-WAIT状态的TCP连接。
+
+### 实例11：列出所有ESTABLISHED状态的连接并显示其计时器信息
 
 ```shell
-[root@localhost ~]# ss  -tan|awk 'NR>1{++S[$1]}END{for (a in S) print a,S[a]}'
-LISTEN 7
-ESTAB 31
-TIME-WAIT 28
+$ ss -t -o state established
 ```
 
+## 注意事项
 
+* 使用ss命令时通常需要具有root权限，尤其是在使用-p选项查看套接字关联的进程信息时。
+* ss命令具有强大的过滤器，可以使用复杂的条件来过滤显示的套接字。
+* 某些选项可能在各个Linux发行版的ss版本中表现略有不同，查阅相应的手册页(man ss)可以获得更准确的信息。
