@@ -1,19 +1,47 @@
 du
 ===
 
-显示每个文件和目录的磁盘使用空间
+显示指定文件和目录占用的磁盘空间
 
 ## 补充说明
 
-**du命令** 也是查看使用空间的，但是与df命令不同的是Linux du命令是对文件和目录磁盘使用的空间的查看，还是和df命令有一些区别的。
+du （disk usage）命令用于显示指定的目录或文件所占用的磁盘空间。
+du命令与df命令不同，df 命令是统计文件系统整体磁盘使用情况（已使用和未使用量），du 命令是统计指定目录或文件占用磁盘的大小。
 
-### 语法
+## 适用的Linux版本
 
-```shell
-du [选项][文件]
+du命令是一个标准的Linux命令，它适用于大多数的Linux发行版，如Ubuntu, Debian, CentOS, Fedora, RedHat等。如果某些Linux系统没有安装du命令，可以使用以下命令进行安装：
+
+- 对于使用apt-get作为包管理工具的系统，如Ubuntu, Debian等，可以使用以下命令安装du命令：
+
+```bash
+sudo apt-get update
+sudo apt-get install coreutils
 ```
 
-### 选项
+- 对于使用yum作为包管理工具的系统，如CentOS, Fedora, RedHat等，可以使用以下命令安装du命令：
+
+```bash
+sudo yum update
+sudo yum install coreutils
+```
+
+- 对于使用dnf作为包管理工具的系统，如CentOS 8等，可以使用以下命令安装du命令：
+
+```bash
+sudo dnf update
+sudo dnf install coreutils
+```
+
+## 命令语法
+
+```shell
+du [选项][文件或目录]
+```
+
+**如果没有指定文件或目录，du命令会显示当前目录下各个子目录和文件所占用的磁盘空间大小，默认显示单位KB**。
+
+## 选项
 
 ```shell
 -a, --all                              显示目录中个别文件的大小。
@@ -46,11 +74,54 @@ du [选项][文件]
 --version                              显示版本信息并退出
 ```
 
-### 实例
+## 示例
 
-文件从大到小排序
+### 显示当前目录下各个子目录所占用的磁盘空间大小
+
+```shell
+$ du
+8       ./dir2
+12      ./dir1/dir1-dira
+876     ./dir1
+1092    .
 ```
-ubuntu@VM-0-14-ubuntu:~/git-work/linux-command$ du -sh * |sort -rh
+
+### 显示当前目录下各个子目录+文件所占用的磁盘空间大小
+
+```shell
+$ du -a
+100     ./file2
+8       ./dir2
+100     ./file1
+4       ./dir1/dir1-dira/dir1-dira-file1
+12      ./dir1/dir1-dira
+792     ./dir1/dir1-file2
+64      ./dir1/dir1-file1
+876     ./dir1
+1092    .
+```
+
+### 以易读的方式显示目录大小
+
+```shell
+$ du -h /home/test
+8.0K    /home/test/dir2
+12K     /home/test/dir1/dir1-dira
+876K    /home/test/dir1
+1.1M    /home/test
+```
+
+### 只显示目录大小总和
+
+```shell
+ubuntu@VM-0-14-ubuntu:~/git-work/linux-command/assets$ du -s .
+1932    .
+```
+
+### 文件从大到小排序
+
+```shell
+$ du -sh * |sort -rh
 2.9M    command
 1.9M    assets
 148K    template
@@ -62,41 +133,4 @@ ubuntu@VM-0-14-ubuntu:~/git-work/linux-command$ du -sh * |sort -rh
 4.0K    package.json
 4.0K    LICENSE
 ```
-
-只显示当前目录下子目录的大小。
-
-```shell
-ubuntu@VM-0-14-ubuntu:~/git-work/linux-command$ du -sh ./*/
-1.9M    ./assets/
-28K     ./build/
-2.9M    ./command/
-52K     ./dist/
-148K    ./template/
-```
-
-查看指定目录下文件所占的空间：
-
-```shell
-ubuntu@VM-0-14-ubuntu:~/git-work/linux-command/assets$ du ./*
-144     ./alfred.png
-452     ./chrome-extensions.gif
-4       ./dash-icon.png
-1312    ./Linux.gif
-16      ./qr.png
-```
-
-只显示总和的大小:
-
-```shell
-ubuntu@VM-0-14-ubuntu:~/git-work/linux-command/assets$ du -s .
-1932    .
-```
-
-显示总和的大小且易读:
-
-```shell
-ubuntu@VM-0-14-ubuntu:~/git-work/linux-command/assets$ du -sh .
-1.9M    .
-```
-
 

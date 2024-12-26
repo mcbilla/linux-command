@@ -1,19 +1,39 @@
 df
 ===
 
-显示磁盘的相关信息
+显示磁盘的空间使用情况
 
 ## 补充说明
 
-**df命令** 用于显示磁盘分区上的可使用的磁盘空间。默认显示单位为KB。可以利用该命令来获取硬盘被占用了多少空间，目前还剩下多少空间等信息。
+df命令（英文全拼：disk free）用于显示目前在Linux系统上的文件系统磁盘使用情况统计。它可以帮助我们了解文件系统的磁盘使用情况，包括已使用的磁盘空间、可用的磁盘空间等。默认显示单位为KB。
 
-###  语法 
+## 适用的Linux版本
+
+df命令在大多数Linux发行版中都可以使用，包括但不限于Ubuntu, Debian, Fedora, CentOS等。如果你发现你的系统中没有df命令，你可以尝试使用你的包管理器来安装它。例如，在基于Debian的系统中，你可以使用以下命令来安装：
 
 ```shell
-df(选项)(参数)
+$ sudo apt-get -y install coreutils
 ```
 
-###  选项 
+在基于RHEL的系统中，你可以使用以下命令来安装：
+
+```shell
+$ sudo yum -y install coreutils
+```
+
+在centos8中：
+
+```shell
+$ sudo dnf -y install coreutils
+```
+
+##  命令语法
+
+```shell
+df [options] [文件/目录]
+```
+
+##  选项
 
 ```shell
 -a或--all：包含全部的文件系统；
@@ -34,22 +54,16 @@ df(选项)(参数)
 --version：显示版本信息。
 ```
 
-###  参数 
-
-文件：指定文件系统上的文件。
-
-### 大小格式
-
 显示值以 `--block-size` 和 `DF_BLOCK_SIZE`，`BLOCK_SIZE` 和 `BLOCKSIZE` 环境变量中的第一个可用 `SIZE` 为单位。 否则，单位默认为 `1024` 个字节（如果设置 `POSIXLY_CORRECT`，则为`512`）。
 
 SIZE是一个整数和可选单位（例如：10M是10 * 1024 * 1024）。 单位是K，M，G，T，P，E，Z，Y（1024的幂）或KB，MB，...（1000的幂）。
 
-###  实例 
+## 示例
 
-查看系统磁盘设备，默认是KB为单位：
+### 查看系统磁盘设备（默认是KB为单位）
 
 ```shell
-[root@LinServ-1 ~]# df
+$ df
 文件系统               1K-块        已用     可用 已用% 挂载点
 /dev/sda2            146294492  28244432 110498708  21% /
 /dev/sda1              1019208     62360    904240   7% /boot
@@ -57,10 +71,10 @@ tmpfs                  1032204         0   1032204   0% /dev/shm
 /dev/sdb1            2884284108 218826068 2518944764   8% /data1
 ```
 
-使用`-h`选项以KB以上的单位来显示，可读性高：
+### 以人类易读的方式显示
 
 ```shell
-[root@LinServ-1 ~]# df -h
+$ df -h
 文件系统              容量  已用 可用 已用% 挂载点
 /dev/sda2             140G   27G  106G  21% /
 /dev/sda1             996M   61M  884M   7% /boot
@@ -68,10 +82,10 @@ tmpfs                1009M     0 1009M   0% /dev/shm
 /dev/sdb1             2.7T  209G  2.4T   8% /data1
 ```
 
-查看全部文件系统：
+### 查看全部文件系统
 
 ```shell
-[root@LinServ-1 ~]# df -a
+$ df -a
 文件系统               1K-块        已用     可用 已用% 挂载点
 /dev/sda2            146294492  28244432 110498708  21% /
 proc                         0         0         0   -  /proc
@@ -83,12 +97,12 @@ tmpfs                  1032204         0   1032204   0% /dev/shm
 none                         0         0         0   -  /proc/sys/fs/binfmt_misc
 ```
 
-显示 `public` 目录中的可用空间量，如以下输出中所示：
+### 查看指定目录所在的文件系统
 
 ```shell
-df public
-# Filesystem     1K-blocks     Used Available Use% Mounted on
-# /dev/loop0      18761008 15246924   2554392  86% /d Avail
+$ df /usr/tmp
+Filesystem     1K-blocks     Used Available Use% Mounted on
+/dev/sda1       41921540 15400324  26521216  37% /
 ```
 
 
