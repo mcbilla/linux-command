@@ -1,116 +1,147 @@
 mv
 ===
 
-用来对文件或目录重新命名
+对文件或目录重命名或者移动
 
 ## 补充说明
 
-**mv命令** 用来对文件或目录重新命名，或者将文件从一个目录移到另一个目录中。source表示源文件或目录，target表示目标文件或目录。如果将一个文件移到一个已经存在的目标文件中，则目标文件的内容将被覆盖。
+**mv命令** 用来对文件或目录重新命名，或者将将源文件移至目标文件或者目标目录中。注意：mv 与 cp 的结果不同，mv 好像文件“搬家”，文件个数并未增加。而 cp 对文件进行复制，文件个数增加了。
 
-mv命令可以用来将源文件移至一个目标文件中，或将一组文件移至一个目标目录中。源文件被移至目标文件有两种不同的结果：
+## 适用的Linux版本
 
-1.  如果目标文件是到某一目录文件的路径，源文件会被移到此目录下，且文件名不变。
-2.  如果目标文件不是目录文件，则源文件名（只能有一个）会变为此目标文件名，并覆盖己存在的同名文件。如果源文件和目标文件在同一个目录下，mv的作用就是改文件名。当目标文件是目录文件时，源文件或目录参数可以有多个，则所有的源文件都会被移至目标文件中。所有移到该目录下的文件都将保留以前的文件名。
+mv命令是一个通用的Linux命令，它适用于几乎所有的Linux发行版，如Ubuntu, Debian, CentOS, Fedora, Red Hat等。 如果你的Linux系统中没有安装mv命令，你可以使用以下命令来安装它：
 
-注意事项：mv与cp的结果不同，mv好像文件“搬家”，文件个数并未增加。而cp对文件进行复制，文件个数增加了。
-
-###  语法 
+* 基于Debian的系统，如Ubuntu
 
 ```shell
-mv(选项)(参数)
+sudo apt install coreutils
 ```
 
-###  选项 
+* 基于Red Hat的系统，如CentOS
 
 ```shell
---backup=<备份模式>：若需覆盖文件，则覆盖前先行备份；
--b：当文件存在时，覆盖前，为其创建一个备份；
--f：若目标文件或目录与现有的文件或目录重复，则直接覆盖现有的文件或目录；
--i：交互式操作，覆盖前先行询问用户，如果源文件与目标文件或目标目录中的文件同名，则询问用户是否覆盖目标文件。用户输入”y”，表示将覆盖目标文件；输入”n”，表示取消对源文件的移动。这样可以避免误将文件覆盖。
---strip-trailing-slashes：删除源文件中的斜杠“/”；
--S<后缀>：为备份文件指定后缀，而不使用默认的后缀；
---target-directory=<目录>：指定源文件要移动到目标目录；
--u：当源文件比目标文件新或者目标文件不存在时，才执行移动操作。
+sudo yum install coreutils
 ```
 
-###  参数 
-
-*   源文件：源文件列表。
-*   目标文件：如果“目标文件”是文件名则在移动文件的同时，将其改名为“目标文件”；如果“目标文件”是目录名则将源文件移动到“目标文件”下。
-
-###  实例 
-
-将目录`/usr/men`中的所有文件移到当前目录（用`.`表示）中：
+##  命令语法
 
 ```shell
-mv /usr/men/* .
+mv [选项] 源文件或目录 目标文件或目录
 ```
 
-移动文件
+其中，源文件或目录是要移动或重命名的文件或目录，目标文件或目录是移动后或重命名后的文件或目录。如果源文件或目录有多个，那么目标文件或目录必须是一个已存在的目录。如果源文件或目录只有一个，那么目标文件或目录可以是一个不存在的文件或目录，此时相当于重命名操作。
+
+##  选项
 
 ```shell
-mv file_1.txt /home/office/
+-f 或 --force：强制覆盖已存在的目标文件或目录，不提示用户确认。
+-i 或 --interactive：在覆盖已存在的目标文件或目录之前，提示用户确认。
+-n 或 --no-clobber：不覆盖已存在的目标文件或目录，不提示用户确认。
+-u 或 --update：只在源文件或目录比目标文件或目录新时才进行移动操作。
+-v 或 --verbose：显示移动操作的详细信息。
+-b 或 --backup：在覆盖已存在的目标文件或目录之前，对其进行备份。
+-t 或 --target-directory：指定一个已存在的目标目录，将所有源文件或目录移动到该目录中。
+-T 或 --no-target-directory：将源文件或目录视为单个实体，不管它是否是一个已存在的目录。
 ```
 
-移动多个文件
+## 示例
 
-```shell
-mv file_2.txt file_3.txt file_4.txt /home/office/
-mv *.txt /home/office/
+### 将文件file1.txt重命名为file2.txt
+
+```bash
+$ mv file1.txt file2.txt
 ```
 
-移动目录
+### 将当前目录下所有以.txt结尾的文件移动到test目录中
 
-```shell
-mv directory_1/ /home/office/
+```bash
+# 使用通配符*匹配所有以.txt结尾的文件
+# 使用-t选项指定test为目标目录
+$ mv -t test *.txt
 ```
 
-重命名文件或目录
+### 将test目录重命名为test2
 
-```shell
-mv file_1.txt file_2.txt # 将文件file_1.txt改名为file_2.txt
+```bash
+$ mv test test2
 ```
 
-重命名目录
+### 将test目录移动到/home/user目录下，并保持原来的名称
 
-```shell
-mv directory_1/ directory_2/
+```bash
+$ mv -t /home/user test
 ```
 
-打印移动信息
+### 将test目录移动到/home/user目录下，并重命名为test2
 
-```shell
-mv -v *.txt /home/office
+```bash
+# 直接指定目标文件或目录为/home/user/test2
+$ mv test /home/user/test2
 ```
 
-提示是否覆盖文件
+### 在移动文件或目录之前，提示用户确认
 
-```shell
-mv -i file_1.txt /home/office
+```bash
+# 使用-i选项开启交互模式
+$ mv -i file1.txt file2.txt
+# 如果file2.txt已存在，会显示如下信息，并等待用户输入y或n
+mv: overwrite 'file2.txt'? 
 ```
 
-源文件比目标文件新时才执行更新
+### 在移动文件或目录之前，对其进行备份
 
-```shell
-mv -uv *.txt /home/office
+```bash
+# 使用-b选项开启备份模式
+$ mv -b file1.txt file2.txt
+# 如果file2.txt已存在，会将其备份为file2.txt~
 ```
 
-不要覆盖任何已存在的文件
+### 显示移动操作的详细信息
 
-```shell
-mv -vn *.txt /home/office
+```bash
+# 使用-v选项开启详细模式
+$ mv -v file1.txt file2.txt
+# 会显示如下信息，表示file1.txt已被重命名为file2.txt
+renamed 'file1.txt' -> 'file2.txt'
 ```
 
-复制时创建备份
+### 不覆盖已存在的目标文件或目录
 
-```shell
-mv -bv *.txt /home/office
+```bash
+# 使用-n选项开启不覆盖模式
+$ mv -n file1.txt file2.txt
+# 如果file2.txt已存在，不会进行任何操作，也不会提示用户确认
 ```
 
-无条件覆盖已经存在的文件
+### 只在源文件或目录比目标文件或目录新时才进行移动操作
 
-```shell
-mv -f *.txt /home/office
+```bash
+# 使用-u选项开启更新模式
+$ mv -u file1.txt file2.txt
+# 如果file1.txt的修改时间比file2.txt的修改时间晚，会进行移动操作，否则不会进行任何操作，也不会提示用户确认
 ```
 
+### 将多个源文件或目录移动到一个已存在的目标目录中
 
+```bash
+# 直接指定多个源文件或目录和一个已存在的目标目录作为参数，以空格分隔
+$ mv file1.txt file2.txt test3 test4 /home/user/test5 
+# 会将file1.txt, file2.txt, test3, test4都移动到/home/user/test5这个已存在的目录中，并保持原来的名称，如果有同名的文件或目录，会覆盖它们，除非使用其他选项来改变这一行为。
+```
+
+### 将多个源文件或目录移动到一个不存在的文件或目录中
+
+```bash
+# 直接指定多个源文件或目录和一个不存在的文件或目录作为参数，以空格分隔
+$ mv file1.txt file2.txt test3 test4 /home/user/test5 
+# 会报错，提示/home/user/test5不是一个已存在的目录
+mv: target '/home/user/test5' is not a directory
+```
+
+### 将一个源文件或目录视为单个实体，不管它是否是一个已存在的目录
+
+```bash
+# 使用-T选项开启不作为目标目录模式
+$ mv -T file1.txt /home/user/test5 
+# 会将file1.txt重命名为/home/user/test5，不管/home/user/test5是否是一个已存在的目录，如果是，会覆盖它，除非使用其他选项来改变这一行为。
+```
