@@ -1,38 +1,58 @@
 lsof
 ===
 
-显示Linux系统当前已打开的所有文件列表 `lsof -p pid`
+显示Linux中的文件打开情况
 
 ## 补充说明
 
-**lsof命令** 用于查看你进程打开的文件，打开文件的进程，进程打开的端口(TCP、UDP)。找回/恢复删除的文件。是十分方便的系统监视工具，因为lsof命令需要访问核心内存和各种文件，所以需要root用户执行。
+`lsof`是一个用来展示Linux系统中被进程打开的文件列表的命令。这个工具非常有用，因为在Unix、Linux中，几乎所有事物都以文件的形式存在，包括硬件设备、套接字、管道等。`lsof`可以帮助系统管理员监控系统中的文件使用情况，排查文件和进程相关的问题。
 
-在linux环境下，任何事物都以文件的形式存在，通过文件不仅仅可以访问常规数据，还可以访问网络连接和硬件。所以如传输控制协议 (TCP) 和用户数据报协议 (UDP) 套接字等，系统在后台都为该应用程序分配了一个文件描述符，无论这个文件的本质如何，该文件描述符为应用程序与基础操作系统之间的交互提供了通用接口。因为应用程序打开文件的描述符列表提供了大量关于这个应用程序本身的信息，因此通过lsof工具能够查看这个列表对系统监测以及排错将是很有帮助的。
+## 适用的Linux版本
 
-### 语法
+`lsof`在大多数Linux发行版中都是可用的。对于少数不自带此命令的发行版，可以通过包管理器进行安装。在CentOS 7和CentOS 8中，安装命令分别如下：
 
-```shell
-lsof (选项)
-```
-
-### 选项
+- CentOS 7：
 
 ```shell
--a：列出打开文件存在的进程；
--c<进程名>：列出指定进程所打开的文件；
--g：列出GID号进程详情；
--d<文件号>：列出占用该文件号的进程；
-+d<目录>：列出目录下被打开的文件；
-+D<目录>：递归列出目录下被打开的文件；
--n<目录>：列出使用NFS的文件；
--i<条件>：列出符合条件的进程（协议、:端口、 @ip ）
--p<进程号>：列出指定进程号所打开的文件；
--u：列出UID号进程详情；
--h：显示帮助信息；
--v：显示版本信息
+$ sudo yum install lsof
 ```
 
-### 实例
+- CentOS 8：
+
+```shell
+$ sudo dnf install lsof
+```
+
+* 对于其他发行版，例如Ubuntu或Debian
+
+```shell
+$ sudo apt-get install lsof
+```
+
+## 命令语法
+
+```shell
+lsof [options]
+```
+
+## 选项
+
+| 选项 | 描述                               |
+| ---- | ---------------------------------- |
+| -i   | 显示网络连接相关的文件             |
+| -u   | 列出指定用户打开的文件             |
+| -p   | 列出指定进程号所打开的文件         |
+| +d   | 列出指定目录下被打开的文件         |
+| -t   | 仅显示进程ID                       |
+| -n   | 不将IP转换成hostname               |
+| -l   | 不将用户ID转换成用户名             |
+| -c   | 列出使用特定命令名的进程打开的文件 |
+| -r   | 重复列出文件，直到被中断           |
+| -a   | 同时使用多个条件进行匹配           |
+
+## 示例
+
+### 列出所有打开的文件
 
 ```shell
 lsof
@@ -42,29 +62,9 @@ init          1 root  rtd       DIR                8,2     4096          2 /
 init          1 root  txt       REG                8,2    43496    6121706 /sbin/init
 init          1 root  mem       REG                8,2   143600    7823908 /lib64/ld-2.5.so
 init          1 root  mem       REG                8,2  1722304    7823915 /lib64/libc-2.5.so
-init          1 root  mem       REG                8,2    23360    7823919 /lib64/libdl-2.5.so
-init          1 root  mem       REG                8,2    95464    7824116 /lib64/libselinux.so.1
-init          1 root  mem       REG                8,2   247496    7823947 /lib64/libsepol.so.1
-init          1 root   10u     FIFO               0,17                1233 /dev/initctl
-migration     2 root  cwd       DIR                8,2     4096          2 /
-migration     2 root  rtd       DIR                8,2     4096          2 /
-migration     2 root  txt   unknown                                        /proc/2/exe
-ksoftirqd     3 root  cwd       DIR                8,2     4096          2 /
-ksoftirqd     3 root  rtd       DIR                8,2     4096          2 /
-ksoftirqd     3 root  txt   unknown                                        /proc/3/exe
-migration     4 root  cwd       DIR                8,2     4096          2 /
-migration     4 root  rtd       DIR                8,2     4096          2 /
-migration     4 root  txt   unknown                                        /proc/4/exe
-ksoftirqd     5 root  cwd       DIR                8,2     4096          2 /
-ksoftirqd     5 root  rtd       DIR                8,2     4096          2 /
-ksoftirqd     5 root  txt   unknown                                        /proc/5/exe
-events/0      6 root  cwd       DIR                8,2     4096          2 /
-events/0      6 root  rtd       DIR                8,2     4096          2 /
-events/0      6 root  txt   unknown                                        /proc/6/exe
-events/1      7 root  cwd       DIR                8,2     4096          2 /
 ```
 
-**lsof输出各列信息的意义如下：**
+lsof输出各列信息的意义如下：
 
 标识 | 说明
 :- | :-
@@ -75,7 +75,7 @@ events/1      7 root  cwd       DIR                8,2     4096          2 /
 `PGID` | 进程所属组
 `FD` | 文件描述符，应用程序通过它识别该文件
 
-文件描述符列表：
+FD文件描述符列表：
 
 标识 | 说明
 :- | :-
@@ -123,7 +123,7 @@ events/1      7 root  cwd       DIR                8,2     4096          2 /
 `space` | 如果没有锁
 
 
-**文件类型**
+TYPE文件类型
 
 标识 | 说明
 :- | :-
@@ -139,117 +139,100 @@ events/1      7 root  cwd       DIR                8,2     4096          2 /
 `NAME` | 打开文件的确切名称
 `REG` | 常规文件
 
-列出指定进程号所打开的文件:
+### 列出特定用户打开的文件
 
 ```shell
-lsof -p $pid
+$ lsof -u username
 ```
 
-获取端口对应的进程ID=>pid
+### 显示所有网络连接
 
 ```shell
-lsof -i:9981 -P -t -sTCP:LISTEN
+$ lsof -i
 ```
 
-列出打开文件的进程:
+### 列出使用某个端口的所有进程
 
 ```shell
-lsof $filename
+$ lsof -i :80
 ```
 
-查看端口占用
+### 列出某个进程打开的文件
+
 ```shell
-lsof -i:$port
+$ lsof -p PID
 ```
 
-**查看所有打开的文件：**
+### 列出某个目录下所有被打开的文件
 
-```
-lsof
-```
-
-**查看指定进程打开的文件：**
-
-```
-lsof -p <PID>
+```shell
+$ lsof +d /path/to/directory
 ```
 
-**查看指定用户打开的文件：**
+### 列出所有的IPv4网络文件
 
-```
-lsof -u <username>
-```
-
-**查看指定文件名相关的进程：**
-
-```
-lsof <filename>
+```shell
+$ lsof -i 4
 ```
 
-**查看网络连接相关的进程：**
+### 列出所有的IPv6网络文件
 
-```
-lsof -i
-```
-
-**查看指定端口相关的进程：**
-
-```
-lsof -i :<port>
+```shell
+$ lsof -i 6
 ```
 
-**查看正在使用某个目录的进程：**
+### 显示特定端口的网络信息
 
-```
-lsof +D /path/to/directory
-```
-
-**查看被删除但仍然被某个进程打开的文件：**
-
-```
-lsof -u +L1
+```shell
+[linux$ lsof -i :22
 ```
 
-**查看某个文件系统上被打开的文件：**
+### 列出所有unix套接字文件
 
-```
-lsof /mountpoint
-```
-
-**以列表形式显示结果：**
-
-```
-lsof -F
+```shell
+$ lsof -U
 ```
 
-**显示结果中不包含主机名：**
+### 列出没有与任何文件关联的进程
 
-```
-lsof -n
-```
-
-**显示结果中不包含进程路径：**
-
-```
-lsof -b
+```shell
+$ lsof -d '^mem'
 ```
 
-**以逆序显示结果：**
+### 监控文件系统活动
 
-```
-lsof -r
-```
-
-**以特定间隔时间循环显示结果：**
-
-```
-lsof -r <interval>
+```shell
+$ lsof -r 2
 ```
 
-**以持续模式显示结果：**
+### 查找哪个进程使用了某个文件
 
+```shell
+$ lsof /path/to/file
 ```
-lsof -t <interval>
+
+### 列出某个用户的所有活动网络连接
+
+```shell
+$ lsof -a -u username -i
 ```
 
+### 查找打开文件数量最多的进程
 
+```shell
+$ lsof | awk '{print $2}' | sort | uniq -c | sort -n | tail -1
+```
+
+## 常见技巧
+
+### 实时监控特定文件的使用情况
+
+```shell
+$ watch -n 1 'lsof | grep [filename]'
+```
+
+### 结合`grep`命令过滤输出
+
+```shell
+$ lsof | grep 'pattern'
+```

@@ -7,17 +7,15 @@ ls
 
 **ls命令** 就是list的缩写，用来显示目标列表，在Linux中是使用率较高的命令。ls命令的输出信息可以进行彩色加亮显示，以分区不同类型的文件。
 
-###  语法
+##  命令语法
 
 ```shell
-ls [选项] [文件名...]
-   [-1abcdfgiklmnopqrstuxABCDFGLNQRSUX] [-w cols] [-T cols] [-I pattern] [--full-time] 
-   [--format={long,verbose,commas,across,vertical,single-col‐umn}] 
-   [--sort={none,time,size,extension}] [--time={atime,access,use,ctime,status}] 
-   [--color[={none,auto,always}]] [--help] [--version] [--]
+ls [选项] [文件或目录]
 ```
 
-###  选项
+其中，选项可以是一个或多个字母，用来指定显示文件和目录的方式；文件或目录可以是一个或多个路径，用来指定要列出的文件和目录。如果不指定文件或目录，则默认为当前工作目录。
+
+##  选项
 
 ```shell
 -C     # 多列输出，纵向排序。
@@ -171,33 +169,29 @@ none # 不使用颜色，这是缺省项。
        # 不能恰当地生成文件时，这个选项会提供帮助。
 ```
 
-###  参数
-
-目录：指定要显示列表的目录，也可以是具体的文件。
-
-###  实例
+##  示例
 
 ```shell
 $ ls       # 仅列出当前目录可见文件
 $ ls -l    # 列出当前目录可见文件详细信息
-$ ls -hl   # 列出详细信息并以可读大小显示文件大小
-$ ls -al   # 列出所有文件（包括隐藏）的详细信息
+$ ls -lh   # 列出详细信息并以可读大小显示文件大小
+$ ls -la   # 列出所有文件（包括隐藏）的详细信息
 $ ls --human-readable --size -1 -S --classify # 按文件大小排序
 $ du -sh * | sort -h # 按文件大小排序(同上)
 ```
 
-显示当前目录下包括隐藏文件在内的所有文件列表
+### 显示当前目录下包括隐藏文件在内的所有文件列表
 
 ```shell
-[root@localhost ~]# ls -a
+$ ls -a
 .   anaconda-ks.cfg  .bash_logout   .bashrc  install.log         .mysql_history  satools  .tcshrc   .vimrc
 ..  .bash_history    .bash_profile  .cshrc   install.log.syslog  .rnd            .ssh     .viminfo
 ```
 
-输出长格式列表
+### 输出长格式列表
 
 ```shell
-[root@localhost ~]# ls -1
+$ ls -1
 
 anaconda-ks.cfg
 install.log
@@ -205,38 +199,36 @@ install.log.syslog
 satools
 ```
 
-显示文件的inode信息
+### 显示文件的inode信息
 
 索引节点（index inode简称为“inode”）是Linux中一个特殊的概念，具有相同的索引节点号的两个文本本质上是同一个文件（除文件名不同外）。
 
 ```shell
-[root@localhost ~]# ls -i -l anaconda-ks.cfg install.log
+$ ls -i -l anaconda-ks.cfg install.log
 2345481 -rw------- 1 root root   859 Jun 11 22:49 anaconda-ks.cfg
 2345474 -rw-r--r-- 1 root root 13837 Jun 11 22:49 install.log
 ```
 
-水平输出文件列表
+### 水平输出文件列表
 
 ```shell
-[root@localhost /]# ls -m
+$ ls -m
 
 bin, boot, data, dev, etc, home, lib, lost+found, media, misc, mnt, opt, proc, root, sbin, selinux, srv, sys, tmp, usr, var
 ```
 
-修改最后一次编辑的文件
-
-最近修改的文件显示在最上面。
+### 最近修改的文件显示在最上面
 
 ```shell
-[root@localhost /]# ls -t
+$ ls -t
 
 tmp  root  etc  dev  lib  boot  sys  proc  data  home  bin  sbin  usr  var  lost+found  media  mnt  opt  selinux  srv  misc
 ```
 
-显示递归文件
+### 显示递归文件
 
 ```shell
-[root@localhost ~]# ls -R
+$ ls -R
 .:
 anaconda-ks.cfg  install.log  install.log.syslog  satools
 
@@ -244,10 +236,10 @@ anaconda-ks.cfg  install.log  install.log.syslog  satools
 black.txt  freemem.sh  iptables.sh  lnmp.sh  mysql  php502_check.sh  ssh_safe.sh
 ```
 
-打印文件的UID和GID
+### 打印文件的UID和GID
 
 ```shell
-[root@localhost /]# ls -n
+$ ls -n
 
 total 254
 drwxr-xr-x   2 0 0  4096 Jun 12 04:03 bin
@@ -255,28 +247,13 @@ drwxr-xr-x   4 0 0  1024 Jun 15 14:45 boot
 drwxr-xr-x   6 0 0  4096 Jun 12 10:26 data
 drwxr-xr-x  10 0 0  3520 Sep 26 15:38 dev
 drwxr-xr-x  75 0 0  4096 Oct 16 04:02 etc
-drwxr-xr-x   4 0 0  4096 Jun 12 10:26 home
-drwxr-xr-x  14 0 0 12288 Jun 16 04:02 lib
-drwx------   2 0 0 16384 Jun 11 22:46 lost+found
-drwxr-xr-x   2 0 0  4096 May 11  2011 media
-drwxr-xr-x   2 0 0  4096 Nov  8  2010 misc
-drwxr-xr-x   2 0 0  4096 May 11  2011 mnt
-drwxr-xr-x   2 0 0  4096 May 11  2011 opt
-dr-xr-xr-x 232 0 0     0 Jun 15 11:04 proc
-drwxr-x---   4 0 0  4096 Oct 15 14:43 root
-drwxr-xr-x   2 0 0 12288 Jun 12 04:03 sbin
-drwxr-xr-x   2 0 0  4096 May 11  2011 selinux
-drwxr-xr-x   2 0 0  4096 May 11  2011 srv
-drwxr-xr-x  11 0 0     0 Jun 15 11:04 sys
-drwxrwxrwt   3 0 0 98304 Oct 16 08:45 tmp
-drwxr-xr-x  13 0 0  4096 Jun 11 23:38 usr
-drwxr-xr-x  19 0 0  4096 Jun 11 23:38 var
+
 ```
 
-列出文件和文件夹的详细信息
+### 列出文件和文件夹的详细信息
 
 ```shell
-[root@localhost /]# ls -l
+$ ls -l
 
 total 254
 drwxr-xr-x   2 root root  4096 Jun 12 04:03 bin
@@ -284,28 +261,12 @@ drwxr-xr-x   4 root root  1024 Jun 15 14:45 boot
 drwxr-xr-x   6 root root  4096 Jun 12 10:26 data
 drwxr-xr-x  10 root root  3520 Sep 26 15:38 dev
 drwxr-xr-x  75 root root  4096 Oct 16 04:02 etc
-drwxr-xr-x   4 root root  4096 Jun 12 10:26 home
-drwxr-xr-x  14 root root 12288 Jun 16 04:02 lib
-drwx------   2 root root 16384 Jun 11 22:46 lost+found
-drwxr-xr-x   2 root root  4096 May 11  2011 media
-drwxr-xr-x   2 root root  4096 Nov  8  2010 misc
-drwxr-xr-x   2 root root  4096 May 11  2011 mnt
-drwxr-xr-x   2 root root  4096 May 11  2011 opt
-dr-xr-xr-x 232 root root     0 Jun 15 11:04 proc
-drwxr-x---   4 root root  4096 Oct 15 14:43 root
-drwxr-xr-x   2 root root 12288 Jun 12 04:03 sbin
-drwxr-xr-x   2 root root  4096 May 11  2011 selinux
-drwxr-xr-x   2 root root  4096 May 11  2011 srv
-drwxr-xr-x  11 root root     0 Jun 15 11:04 sys
-drwxrwxrwt   3 root root 98304 Oct 16 08:48 tmp
-drwxr-xr-x  13 root root  4096 Jun 11 23:38 usr
-drwxr-xr-x  19 root root  4096 Jun 11 23:38 var
 ```
 
-列出可读文件和文件夹详细信息
+### 列出可读文件和文件夹详细信息
 
 ```shell
-[root@localhost /]# ls -lh
+$ ls -lh
 
 total 254K
 drwxr-xr-x   2 root root 4.0K Jun 12 04:03 bin
@@ -314,64 +275,33 @@ drwxr-xr-x   6 root root 4.0K Jun 12 10:26 data
 drwxr-xr-x  10 root root 3.5K Sep 26 15:38 dev
 drwxr-xr-x  75 root root 4.0K Oct 16 04:02 etc
 drwxr-xr-x   4 root root 4.0K Jun 12 10:26 home
-drwxr-xr-x  14 root root  12K Jun 16 04:02 lib
-drwx------   2 root root  16K Jun 11 22:46 lost+found
-drwxr-xr-x   2 root root 4.0K May 11  2011 media
-drwxr-xr-x   2 root root 4.0K Nov  8  2010 misc
-drwxr-xr-x   2 root root 4.0K May 11  2011 mnt
-drwxr-xr-x   2 root root 4.0K May 11  2011 opt
-dr-xr-xr-x 235 root root    0 Jun 15 11:04 proc
-drwxr-x---   4 root root 4.0K Oct 15 14:43 root
-drwxr-xr-x   2 root root  12K Jun 12 04:03 sbin
-drwxr-xr-x   2 root root 4.0K May 11  2011 selinux
-drwxr-xr-x   2 root root 4.0K May 11  2011 srv
-drwxr-xr-x  11 root root    0 Jun 15 11:04 sys
-drwxrwxrwt   3 root root  96K Oct 16 08:49 tmp
-drwxr-xr-x  13 root root 4.0K Jun 11 23:38 usr
-drwxr-xr-x  19 root root 4.0K Jun 11 23:38 var
+
 ```
 
-显示文件夹信息
+### 显示文件夹信息
 
 ```shell
-[root@localhost /]# ls -ld /etc/
+$ ls -ld /etc/
 
 drwxr-xr-x 75 root root 4096 Oct 16 04:02 /etc/
 ```
 
-按时间列出文件和文件夹详细信息
+### 按时间列出文件和文件夹详细信息
 
 ```shell
-[root@localhost /]# ls -lt
+$ ls -lt
 
 total 254
 drwxrwxrwt   3 root root 98304 Oct 16 08:53 tmp
 drwxr-xr-x  75 root root  4096 Oct 16 04:02 etc
 drwxr-x---   4 root root  4096 Oct 15 14:43 root
 drwxr-xr-x  10 root root  3520 Sep 26 15:38 dev
-drwxr-xr-x  14 root root 12288 Jun 16 04:02 lib
-drwxr-xr-x   4 root root  1024 Jun 15 14:45 boot
-drwxr-xr-x  11 root root     0 Jun 15 11:04 sys
-dr-xr-xr-x 232 root root     0 Jun 15 11:04 proc
-drwxr-xr-x   6 root root  4096 Jun 12 10:26 data
-drwxr-xr-x   4 root root  4096 Jun 12 10:26 home
-drwxr-xr-x   2 root root  4096 Jun 12 04:03 bin
-drwxr-xr-x   2 root root 12288 Jun 12 04:03 sbin
-drwxr-xr-x  13 root root  4096 Jun 11 23:38 usr
-drwxr-xr-x  19 root root  4096 Jun 11 23:38 var
-drwx------   2 root root 16384 Jun 11 22:46 lost+found
-drwxr-xr-x   2 root root  4096 May 11  2011 media
-drwxr-xr-x   2 root root  4096 May 11  2011 mnt
-drwxr-xr-x   2 root root  4096 May 11  2011 opt
-drwxr-xr-x   2 root root  4096 May 11  2011 selinux
-drwxr-xr-x   2 root root  4096 May 11  2011 srv
-drwxr-xr-x   2 root root  4096 Nov  8  2010 misc
 ```
 
-按修改时间列出文件和文件夹详细信息
+### 按修改时间列出文件和文件夹详细信息
 
 ```shell
-[root@localhost /]# ls -ltr
+$ ls -ltr
 
 total 254
 drwxr-xr-x   2 root root  4096 Nov  8  2010 misc
@@ -380,35 +310,20 @@ drwxr-xr-x   2 root root  4096 May 11  2011 selinux
 drwxr-xr-x   2 root root  4096 May 11  2011 opt
 drwxr-xr-x   2 root root  4096 May 11  2011 mnt
 drwxr-xr-x   2 root root  4096 May 11  2011 media
-drwx------   2 root root 16384 Jun 11 22:46 lost+found
-drwxr-xr-x  19 root root  4096 Jun 11 23:38 var
-drwxr-xr-x  13 root root  4096 Jun 11 23:38 usr
-drwxr-xr-x   2 root root 12288 Jun 12 04:03 sbin
-drwxr-xr-x   2 root root  4096 Jun 12 04:03 bin
-drwxr-xr-x   4 root root  4096 Jun 12 10:26 home
-drwxr-xr-x   6 root root  4096 Jun 12 10:26 data
-dr-xr-xr-x 232 root root     0 Jun 15 11:04 proc
-drwxr-xr-x  11 root root     0 Jun 15 11:04 sys
-drwxr-xr-x   4 root root  1024 Jun 15 14:45 boot
-drwxr-xr-x  14 root root 12288 Jun 16 04:02 lib
-drwxr-xr-x  10 root root  3520 Sep 26 15:38 dev
-drwxr-x---   4 root root  4096 Oct 15 14:43 root
-drwxr-xr-x  75 root root  4096 Oct 16 04:02 etc
-drwxrwxrwt   3 root root 98304 Oct 16 08:54 tmp
 ```
 
-按照特殊字符对文件进行分类
+### 按照特殊字符对文件进行分类
 
 ```shell
-[root@localhost nginx-1.2.1]# ls -F
+$ ls -F
 
 auto/  CHANGES  CHANGES.ru  conf/  configure*  contrib/  html/  LICENSE  Makefile  man/  objs/  README  src/
 ```
 
-列出文件并标记颜色分类
+### 列出文件并标记颜色分类
 
 ```shell
-[root@localhost nginx-1.2.1]# ls --color=auto
+$ ls --color=auto
 
 auto  CHANGES  CHANGES.ru  conf  configure  contrib  html  LICENSE  Makefile  man  objs  README  src
 ```
@@ -422,8 +337,7 @@ auto  CHANGES  CHANGES.ru  conf  configure  contrib  html  LICENSE  Makefile  ma
 * `白色`<!--rehype:style=background: #efefef;-->：一般性文件，如文本文件，配置文件等
 * `红色`<!--rehype:style=background: red;color:white;-->：压缩文件或归档文件
 * `浅蓝色`<!--rehype:style=background: #c4c3ff;-->：链接文件
-* 红色闪烁：链接文件存在问题
-* 黄色：设备文件
-* 青黄色：管道文件
-
+* `红色闪烁`：链接文件存在问题
+* `黄色`：设备文件
+* `青黄色`：管道文件
 

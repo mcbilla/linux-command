@@ -1,167 +1,155 @@
 zip
 ===
 
-可以用来解压缩文件
+压缩文件生成zip文件
 
 ## 补充说明
 
-**zip命令** 可以用来解压缩文件，或者对文件进行打包操作。zip是个使用广泛的压缩程序，文件经它压缩后会另外产生具有“.zip”扩展名的压缩文件。
+zip命令在Linux中使用，用于压缩和打包文件。此命令可提取ZIP存档中的文件，并更新或删除ZIP 存档中的文件。它支持不同的压缩方法、级别和加密选项。您还可以创建分割的Zip文件和密码保护的ZIP文件。
 
-### 语法
+## 适用的Linux版本
 
-```shell
-zip(选项)(参数)
-zip [-选项] [-b 路径] [-t 日期] [-n 后缀名] [压缩文件列表] [-xi 列表]
-```
-
-### 选项
+Zip命令适用于大多数Linux发行版本，包括但不限于Ubuntu、Debian、Fedora、CentOS等。在一些Linux发行版本中，可能需要手动安装zip和unzip命令。在CentOS中，可以使用以下命令进行安装：
 
 ```shell
--f: 刷新：仅更改的文件
--u: 更新：仅更改或新文件
--d: 删除 zip 文件中的条目
--m: 移至 zip 文件（删除操作系统文件）
--r: 递归到目录
--j: 垃圾（不记录）目录名
--0: 仅存储
--l: 将 LF 转换为 CR LF (-ll CR LF 到 LF)
--1: 压缩速度更快
--9: 压缩得更好
--v: 详细操作/打印版本信息
--q: 安静运行
--c: 添加一行注释
--z: 添加 zip 文件注释
--@: 从标准输入读取名称
--o: 使 zip 文件与最新条目一样旧
--x: 排除以下名称
--i: 仅包含以下名称
--F: 修复 zip 文件（-FF 更加努力）
--D: 不添加目录条目
--A: 调整自解压exe
--D: 不添加目录条目
--T: 测试 zip 文件的完整性
--X: 排除额外的文件属性
--n: 不压缩这些后缀
--e: 加密
--y: 将符号链接存储为链接而不是引用的文件
--h2: 显示更多帮助
+$ sudo yum install zip unzip     #For CentOS 7
+$ sudo dnf install zip unzip     #For CentOS 8
+$ sudo apt-get install zip unzip #Ubuntu、Debian
 ```
 
-### 参数
-
-*   zip压缩包：指定要创建的zip压缩包；
-*   文件列表：指定要压缩的文件列表。
-
-### 实例
-
-压缩单个文件，这会将 `file.txt` 文件压缩到名为 `compressed.zip` 的归档文件中
+## 命令语法
 
 ```shell
-zip compressed.zip file.txt
+zip [options] archive_name file_name
 ```
 
-压缩多个文件，下面这个命令会把 `file1.txt`，`file2.txt`，和 `file3.txt` 压缩到一个叫做 `compressed.zip` 的归档文件中。
+其中，options 是命令行选项（如 -r 用于递归压缩），archive_name 是要创建的存档文件的名称，file_name 是要添加到存档中的文件名。
+
+## 选项
+
+| 选择 | 描述                                   |
+| ---- | -------------------------------------- |
+| -r   | 递归压缩，在压缩目录时需要使用         |
+| -m   | 压缩后移除原文件。                     |
+| -x   | 排除指定文件。                         |
+| -e   | 创建密码保护的压缩包。                 |
+| -q   | 安静模式，压缩过程中不在屏幕显示消息。 |
+
+## 示例
+
+### 简单的压缩文件
+
+创建一个名为archive.zip的压缩文件，其中包含当前目录中的所有文件：
 
 ```shell
-zip compressed.zip file1.txt file2.txt file3.txt
+$ zip archive *
 ```
 
-压缩整个目录，下面这个命令 `-r` 参数表示递归压缩，该命令将压缩 `folder` 目录及其所有子目录和文件
+### 使用-r选项压缩目录
+
+使用 -r 选项可以递归地压缩目录：
 
 ```shell
-zip -r compressed.zip folder/
+$ zip -r archive dir/
 ```
 
-使用最大压缩比压缩文件，下面这个命令 `-9` 参数指定了最大压缩比，尽管可能需要更长的处理时间
+注：在此命令中，archive 是新建存档的名称，dir/ 是要压缩的目录。
+
+### 创建密码保护的ZIP文件
+
+我们可以使用 -e 选项让zip命令提示您输入密码。以下命令会创建一个受密码保护的zip文件：
 
 ```shell
-zip -9 compressed.zip file.txt
+$ zip -e archive.zip file1 file2
 ```
 
-创建密码保护的 zip 文件，下面这个命令 `-e` 参数会提示用户输入密码以创建加密的 zip 文件。
+在此命令中, file1 和 file2 是要添加到存档中的文件，zip命令会提示您两次输入密码。
+
+### 排除特定文件
+
+想压缩一个目录，但希望排除某些文件或目录，请使用-x选项。比如，以下命令将压缩 dir 目录下的所有文件和目录，但将排除所有 .txt 和 .doc 文件：
 
 ```shell
-zip -e secure.zip file.txt
+$ zip -r archive.zip dir/ -x *.txt *.doc
 ```
 
-只压缩新文件或已更改的文件，如果 `compressed.zip` 已存在，`-u` 参数会更新归档中的 `file.txt` 或将其添加至归档中（如果它是新的）
+此处的 -x 选项后面跟随的是一个模式列表，用于指定要排除的文件。
+
+### 压缩多个文件和目录
+
+如果你要在一个命令中压缩多个文件和目录，可以将它们全部列在命令后面，如下所示：
 
 ```shell
-zip -u compressed.zip file.txt
+$ zip archive.zip file1 dir1 file2 dir2
 ```
 
-压缩文件但不保留目录结构，`-j` 参数将不保留 `file.txt` 的父目录 `folder`，文件在 zip 中的位置将是在根目录下
+在这个命令中， file1, dir1, file2, 和 dir2 是要添加到 zip 存档中的文件和目录。
+
+### 使用-q选项
+
+当你急于获得操作结果，在压缩过程中不希望屏幕显示任何消息，可以使用-q选项。例如：
 
 ```shell
-zip -j compressed.zip folder/file.txt
+$ zip -q archive.zip file1 file2
 ```
 
-将`/home/Blinux/html/`这个目录下所有文件和文件夹打包为当前目录下的 `html.zip`：
+在上面的命令中，zip命令将不会输出任何消息，只有在发生错误时，例如存档已存在或找不到文件，它将显示错误消息。
+
+### 使用-m选项
+
+想要在压缩文件后移除原文件，可以使用 -m 选项。比如：
 
 ```shell
-zip -q -r html.zip /home/Blinux/html
+$ zip -m archive.zip file1 file2
 ```
 
-上面的命令操作是将绝对地址的文件及文件夹进行压缩，以下给出压缩相对路径目录，比如目前在Bliux这个目录下，执行以下操作可以达到以上同样的效果：
+此命令将创建一个名为 archive.zip 的新的zip文件，并从文件系统中删除 file1 和 file2。
+
+### 使用 -u 选项更新现有的ZIP文件
+
+如果已有一个zip文件，你想添加新的文件或更新已存在的文件，可以使用-u选项。例如：
 
 ```shell
-zip -q -r html.zip html
+$ zip -u archive.zip file1
 ```
 
-比如现在我的html目录下，我操作的zip压缩命令是：
+在这个命令中，file1将被添加到archive.zip中，如果archive.zip中已有一个叫做file1的文件，它将被新的file1替代。
+
+### 从ZIP文件中删除文件
+
+要从zip文件中删除特定的文件，可以使用-d选项。例如：
 
 ```shell
-zip -q -r html.zip *
+$ zip -d archive.zip file1
 ```
 
-压缩 `example/basic/` 目录内容到 `basic.zip` 压缩包中 `-x` 指定排除目录，注意没有双引号将不起作用。
+在这个命令中，file1将从archive.zip中被删除。
+
+### 创建分割的ZIP文件
+
+如果你要创建一个较大的Zip文件，可以把它分割成多个较小的部分。你可以使用-s选项。比如要创建一个最大部分为5MB的zip文件：
 
 ```shell
-zip -r basic.zip example/basic/ -x "example/basic/node_modules/*" -x "example/basic/build/*" -x "example/basic/coverage/*"
+$ zip -s 5m -r split.zip dir1/
 ```
 
-上面压缩解压出来，内容存放在 `example/basic/`， 如果想存放到根目录，进入目录进行压缩，目前没有找到一个合适的参数来解决此问题。
+在这个命令中，dir1/是你想要压缩的目录，split.zip 将被分割成多个5MB的部分。
 
-```
-cd example/basic/ && zip -r basic.zip . -x "node_modules/*" -x "build/*" -x "coverage/*"
-```
+### 查看ZIP文件的信息
 
-压缩效率选择:
+有时,我们可能需要检查ZIP文件中包含的文件和目录。可以使用-l选项查看archive.zip中的文件列表：
 
 ```shell
-zip -9 # 1-9 faster->better
+$ zip -sf archive.zip
 ```
 
-创建 `public_html` 目录下忽略所有文件和文件夹，排除包括文本 `backup` 的所有文件。
+### 压缩文件并附加注释
+
+zip命令允许在压缩文件时添加注释。仅需使用-z选项，如下所示：
 
 ```shell
-$ zip -r public_html.zip public_html -x *backup*
+$ zip -z archive.zip file1 file2
 ```
 
-`httpdocs` 目录忽略 `.svn` 文件或 `git` 的文件和目录下创建所有文件的归档。
-
-```shell
-$ zip -r httpdocs.zip httpdocs --exclude *.svn* --exclude *.git*
-```
-
-`httpdocs` 目录忽略的所有文件，并与 `.log` 结尾的目录下创建所有文件的归档。
-
-```shell
-$ zip -r httpdocs.zip httpdocs --exclude "*.log"
-```
-
-### 问题解决
-
-CentOS7中命令找不到
-
-```shell
--Bash: Unzip: Command Not Found
-```
-
-解决方法
-
-```shell
-yum install -y unzip zip
-```
-
+运行命令后，命令行将提示您输入注释。输入注释后，按CTRL + D保存并退出。
 

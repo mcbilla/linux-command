@@ -1,7 +1,7 @@
 tar
 ===
 
-将许多文件一起保存至一个单独的磁带或磁盘归档，并能从归档中单独还原所需文件。
+打包、压缩和解压文件
 
 ## 补充说明
 
@@ -11,13 +11,61 @@ tar
 
 为什么要区分这两个概念呢？这源于Linux中很多压缩程序只能针对一个文件进行压缩，这样当你想要压缩一大堆文件时，你得先将这一大堆文件先打成一个包（tar命令），然后再用压缩程序进行压缩（gzip bzip2命令）。
 
-### 语法
+## 适用的Linux版本
 
-```shell
-tar [选项...] [FILE]...
+tar命令是一个标准的Linux命令，几乎所有的Linux发行版都自带了这个工具。如果你的系统没有安装tar命令，你可以使用以下命令来安装它：
+
+- 对于基于Debian或Ubuntu的系统，使用apt-get命令：
+
+```bash
+$ sudo apt-get install tar
 ```
 
-### 选项
+- 对于基于Red Hat或CentOS的系统，使用yum或dnf命令：
+
+```bash
+$ sudo yum install tar
+```
+
+- 对于基于Arch Linux的系统，使用pacman命令：
+
+```bash
+$ sudo pacman -S tar
+```
+
+## 命令语法
+
+```shell
+tar [options] [archive-file] [file or directory to be archived]
+```
+
+其中，options是指定tar命令执行的操作和其他参数，archive-file是指定要创建或处理的压缩文件，file or directory to be archived是指定要打包或解压的文件或目录。
+
+使用该命令时，主选项必须有，辅选项是辅助使用的，可以选用。
+
+主选项：一条命令以下5个参数只能有一个
+
+- -c：--create 新建一个压缩文档，即打包
+- -x：--extract,--get，解压文件
+- -t：--list，查看压缩文档里的所有内容
+- -r：--append，向压缩文档里追加文件
+- -u：--update，更新原压缩包中的文件
+
+辅助选项：
+
+- -z：使用gzip压缩或解压，格式为xxx.tar.gz或xx.tgz
+- -j：使用bzip2压缩或解压，格式为xx.tar.bz2
+- -Z：使用compress压缩或解压，格式为tar.Z
+- -v：显示操作过程
+- -O：将文件解开到标准输出
+- -C：切换到指定目录
+- --exclude FILE：在压缩过程中，不要将FILE打包
+
+以下参数是必须的：
+
+- -f：指定文件名，这个参数是最后一个参数，后面只能接文件名
+
+## 选项
 
 ```shell
 -A, --catenate, --concatenate   追加 tar 文件至归档
@@ -316,234 +364,96 @@ tar [选项...] [FILE]...
 --rsh-command=/usr/bin/ssh
 ```
 
-### 参数
+## 示例
 
-文件或目录：指定要打包的文件或目录列表。
+### 如何使用tar命令创建一个新的压缩文件
 
-### 实例
+如果你想将一个目录（比如test）打包成一个不经过任何压缩的文件（比如test.tar），你可以使用以下命令：
 
-将 `/home/vivek/bin/` 目录打包，并使用 gzip 算法压缩。保存为 `/tmp/bin-backup.tar.gz` 文件。
-
-```
-tar -zcvf /tmp/bin-backup.tar.gz /home/vivek/bin/
+```bash
+$ tar -cvf test.tar test
 ```
 
-```shell
-- z：有gzip属性的
-- j：有bz2属性的
-- Z：有compress属性的
-- v：显示所有过程
-- O：将文件解开到标准输出
+其中，-c选项表示创建一个新的压缩文件，-v选项表示显示详细的操作信息，-f选项表示指定要创建的压缩文件名。
+
+如果你想将一个目录（比如test）打包并使用gzip程序压缩成一个文件（比如test.tar.gz），你可以使用以下命令：
+
+```bash
+$ tar -zcvf test.tar.gz test
 ```
 
-```shell
-tar -cf archive.tar foo bar  # 从文件 foo 和 bar 创建归档文件 archive.tar。
-tar -tvf archive.tar         # 详细列举归档文件 archive.tar 中的所有文件。
-tar -xf archive.tar          # 展开归档文件 archive.tar 中的所有文件。
+其中，-z选项表示使用gzip程序来压缩文件。
+
+类似地，如果你想使用bzip2或xz程序来压缩文件，你可以使用-j或-J选项，比如：
+
+```bash
+$ tar -jcvf test.tar.bz2 test
+$ tar -Jcvf test.tar.xz test
 ```
 
+### 如何使用tar命令从一个压缩文件中提取文件
 
-下面的参数-f是必须的
+如果你想从一个不经过任何压缩的文件（比如test.tar）中提取所有的文件，你可以使用以下命令：
 
--f: 使用档案名字，切记，这个参数是最后一个参数，后面只能接档案名。
-
-```shell
-tar -cf all.tar *.jpg
-# 这条命令是将所有.jpg的文件打成一个名为all.tar的包。-c是表示产生新的包，-f指定包的文件名。
-
-tar -rf all.tar *.gif
-# 这条命令是将所有.gif的文件增加到all.tar的包里面去。-r是表示增加文件的意思。
-
-tar -uf all.tar logo.gif
-# 这条命令是更新原来tar包all.tar中logo.gif文件，-u是表示更新文件的意思。
-
-tar -tf all.tar
-# 这条命令是列出all.tar包中所有文件，-t是列出文件的意思
+```bash
+$ tar -xvf test.tar
 ```
 
-```shell
-tar -cvf archive.tar foo bar  # 从文件foo和bar创建archive.tar。
-tar -tvf archive.tar         # 详细列出archive.tar中的所有文件。
-tar -xf archive.tar          # 从archive.tar提取所有文件。
+其中，-x选项表示从一个压缩文件中提取文件。
+
+如果你想从一个经过gzip程序压缩的文件（比如test.tar.gz）中提取所有的文件，你可以使用以下命令：
+
+```bash
+$ tar -zxvf test.tar.gz
 ```
 
-#### zip格式
+其中，-z选项表示使用gzip程序来解压文件。
 
-压缩： zip -r [目标文件名].zip [原文件/目录名]  
-解压： unzip [原文件名].zip  
-注：-r参数代表递归  
+类似地，如果你想从一个经过bzip2或xz程序压缩的文件中提取所有的文件，你可以使用-j或-J选项，比如：
 
-#### tar格式（该格式仅仅打包，不压缩）
-
-打包：tar -cvf [目标文件名].tar [原文件名/目录名]  
-解包：tar -xvf [原文件名].tar  
-注：c参数代表create（创建），x参数代表extract（解包），v参数代表verbose（详细信息），f参数代表filename（文件名），所以f后必须接文件名。  
-
-#### tar.gz格式
-
-方式一：利用前面已经打包好的tar文件，直接用压缩命令。
-
-压缩：gzip [原文件名].tar  
-解压：gunzip [原文件名].tar.gz  
-
-方式二：一次性打包并压缩、解压并解包
-
-打包并压缩： tar -zcvf [目标文件名].tar.gz [原文件名/目录名]  
-解压并解包： tar -zxvf [原文件名].tar.gz  
-注：z代表用gzip算法来压缩/解压。  
-
-#### tar.bz2格式
-
-方式一：利用已经打包好的tar文件，直接执行压缩命令：
-
-压缩：bzip2 [原文件名].tar  
-解压：bunzip2 [原文件名].tar.bz2  
-方式二：一次性打包并压缩、解压并解包  
-
-打包并压缩： tar -jcvf [目标文件名].tar.bz2 [原文件名/目录名]  
-解压并解包： tar -jxvf [原文件名].tar.bz2  
-注：小写j代表用bzip2算法来压缩/解压。  
-
-#### tar.xz格式
-
-方式一：利用已经打包好的tar文件，直接用压缩命令：
-
-压缩：xz [原文件名].tar  
-解压：unxz [原文件名].tar.xz  
-方式二：一次性打包并压缩、解压并解包  
-
-打包并压缩： tar -Jcvf [目标文件名].tar.xz [原文件名/目录名]  
-解压并解包： tar -Jxvf [原文件名].tar.xz  
-注：大写J代表用xz算法来压缩/解压。  
-
-#### tar.Z格式（已过时）
-
-方式一：利用已经打包好的tar文件，直接用压缩命令：
-
-压缩：compress [原文件名].tar  
-解压：uncompress [原文件名].tar.Z  
-方式二：一次性打包并压缩、解压并解包  
-
-打包并压缩： tar -Zcvf [目标文件名].tar.Z [原文件名/目录名]  
-解压并解包： tar -Zxvf [原文件名].tar.Z  
-注：大写Z代表用ncompress算法来压缩/解压。另，ncompress是早期Unix系统的压缩格式，但由于ncompress的压缩率太低，现已过时。  
-
-#### jar格式
-
-压缩：jar -cvf [目标文件名].jar [原文件名/目录名]  
-解压：jar -xvf [原文件名].jar  
-
-注：如果是打包的是Java类库，并且该类库中存在主类，那么需要写一个META-INF/MANIFEST.MF配置文件，内容如下：  
-
-```shell
-Manifest-Version: 1.0
-Created-By: 1.6.0_27 (Sun Microsystems Inc.)
-Main-class: the_name_of_the_main_class_should_be_put_here
+```bash
+$ tar -jxvf test.tar.bz2
+$ tar -Jxvf test.tar.xz
 ```
 
-然后用如下命令打包：
+如果你只想从一个压缩文件中提取部分文件，你可以在命令后面指定要提取的文件名，比如：
 
-jar -cvfm [目标文件名].jar META-INF/MANIFEST.MF [原文件名/目录名]  
-这样以后就能用“java -jar [文件名].jar”命令直接运行主类中的public static void main方法了。  
-
-#### 7z格式
-
-压缩：7z a [目标文件名].7z [原文件名/目录名]  
-解压：7z x [原文件名].7z  
-注：这个7z解压命令支持rar格式，即：  
-
-7z x [原文件名].rar
-
-#### 其它例子
-
-**将文件全部打包成tar包** ：
-
-```shell
-tar -cvf log.tar log2012.log    仅打包，不压缩！
-tar -zcvf log.tar.gz log2012.log   打包后，以 gzip 压缩
-tar -jcvf log.tar.bz2 log2012.log  打包后，以 bzip2 压缩
+```bash
+$ tar -zxvf test.tar.gz test/file1.txt test/file2.txt
 ```
 
-在选项`f`之后的文件档名是自己取的，我们习惯上都用 .tar 来作为辨识。 如果加`z`选项，则以.tar.gz或.tgz来代表gzip压缩过的tar包；如果加`j`选项，则以.tar.bz2来作为tar包名。
+这个命令只会从test.tar.gz中提取test目录下的file1.txt和file2.txt两个文件。
 
+如果你想将提取的文件放到另一个目录（比如newtest），而不是当前目录，你可以使用-C选项来指定要切换到的目录，比如：
 
-**解压目录**
-
-参数--strip-components NUMBER，在提取时从文件名中删除NUMBER个前导组件，如要去除前二层，参数为--strip-components 2
-
-```shell
-tar -xvf portal-web-v2.0.0.tar --strip-components 1  -C 指定目录
+```bash
+$ tar -zxvf test.tar.gz -C newtest
 ```
 
-示例
+这个命令会将test.tar.gz中的所有文件提取到newtest目录下。
 
-```shell
-tar -xvf xxx.tar.gz -C /usr/src/a
-/usr/src/a/xxxxx/src/opp/b.txt
+### 如何使用tar命令列出一个压缩文件中包含的文件
+
+如果你想查看一个不经过任何压缩的文件（比如test.tar）中包含了哪些文件，而不实际提取它们，你可以使用以下命令：
+
+```bash
+$ tar -tvf test.tar
 ```
 
-```shell
-tar -xvf xxx.tar.gz -strip-components=1 -C /usr/src/a
-/usr/src/a/src/opp/b.txt
+其中，-t选项表示列出一个压缩文件中包含的文件。
+
+如果你想查看一个经过gzip程序压缩的文件（比如test.tar.gz）中包含了哪些文件，你可以使用以下命令：
+
+```bash
+$ tar -ztvf test.tar.gz
 ```
 
-**查阅上述tar包内有哪些文件** ：
+其中，-z选项表示使用gzip程序来解压文件。
 
-```shell
-tar -ztvf log.tar.gz
+类似地，如果你想查看一个经过bzip2或xz程序压缩的文件中包含了哪些文件，你可以使用-j或-J选项，比如：
+
+```bash
+$ tar -jtvf test.tar.bz2
+$ tar -Jtvf test.tar.xz
 ```
-
-由于我们使用 gzip 压缩的log.tar.gz，所以要查阅log.tar.gz包内的文件时，就得要加上`z`这个选项了。
-
-**将tar包解压缩** ：
-
-```shell
-tar -zxvf /opt/soft/test/log.tar.gz
-```
-
-在预设的情况下，我们可以将压缩档在任何地方解开的
-
-**只将tar内的部分文件解压出来** ：
-
-```shell
-tar -zxvf /opt/soft/test/log30.tar.gz log2013.log
-```
-
-我可以透过`tar -ztvf`来查阅 tar 包内的文件名称，如果单只要一个文件，就可以透过这个方式来解压部分文件！
-
-**文件备份下来，并且保存其权限** ：
-
-```shell
-tar -zcvpf log31.tar.gz log2014.log log2015.log log2016.log
-```
-
-这个`-p`的属性是很重要的，尤其是当您要保留原本文件的属性时。
-
-**在文件夹当中，比某个日期新的文件才备份** ：
-
-```shell
-tar -N "2012/11/13" -zcvf log17.tar.gz test
-```
-
-**备份文件夹内容是排除部分文件：**
-
-```shell
-tar --exclude scf/service -zcvf scf.tar.gz scf/*
-```
-
-**打包文件之后删除源文件：**
-
-```shell
-tar -cvf test.tar test --remove-files
-```
-
-**其实最简单的使用 tar 就只要记忆底下的方式即可：**
-
-```shell
-压　缩：tar -jcv -f filename.tar.bz2 要被压缩的文件或目录名称
-查　询：tar -jtv -f filename.tar.bz2
-解压缩：tar -jxv -f filename.tar.bz2 -C 欲解压缩的目录
-```
-
-
 
