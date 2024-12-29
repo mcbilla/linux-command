@@ -8,53 +8,93 @@
 
 **这里存放Linux 命令大全并不全，你可以通过[linux-command](https://linux-command-bay-two.vercel.app/)来搜索，它是把 [command](./assets/command) 目录里面搜集的命令，生成了静态HTML并提供预览以及索引搜索。**
 
-### 文件传输
+## 常用命令
 
-bye、ftp、ftpcount、ftpshut、ftpwho、ncftp、tftp、uucico、uucp、uupick、uuto、scp
+### 网络
 
-### 备份压缩
+- [curl](https://linux.mcbilla.com/c/curl.html)：利用URL规则在命令行下工作的文件传输工具
+- [netstat](https://linux.mcbilla.com/c/netstat.html)：查看网络系统状态信息
+- [ss](https://linux.mcbilla.com/c/ss.html)：比 netstat 更高效好用的 socket 统计信息工具
+- [nc](https://linux.mcbilla.com/c/nc.html)：网络界的瑞士军刀，号称最强大的网络工具
+- [ifconfig](https://linux.mcbilla.com/c/ifconfig.html)：配置和显示网络接口
+- [ip](https://linux.mcbilla.com/c/ip.html)：管理网络接口和路由，用于替代ifconfig、route等命令
+- [tcpdump](https://linux.mcbilla.com/c/tcpdump.html)：抓包工具，用于捕获和分析网络流量
+- [iptables](https://linux.mcbilla.com/c/iptables.html)：Linux上常用的防火墙软件，监控和过滤从服务器进出的网络数据包
 
-ar、bunzip2、bzip2、bzip2recover、compress、cpio、dump、gunzip、gzexe、gzip、lha、restore、tar、unarj、unzip、zip、zipinfo
+### 磁盘和内存
 
-### 文件管理
+- [vmstat](https://linux.mcbilla.com/c/vmstat.html)：监测系统的虚拟内存、进程、CPU活动、块设备I/O等信息
+- [free](https://linux.mcbilla.com/c/free.html)：显示物理内存和交换空间的使用情况
+- [df](https://linux.mcbilla.com/c/df.html)：显示磁盘的空间使用情况
+- [du](https://linux.mcbilla.com/c/du.html)：显示每个文件和目录的磁盘使用空间
+- [tree](https://linux.mcbilla.com/c/tree.html)：树状图列出目录的内容
+- [mount](https://linux.mcbilla.com/c/mount.html)：用于挂载Linux系统外的文件
+- [fsck](https://linux.mcbilla.com/c/fsck.html)：检查并且试图修复文件系统中的错误
 
-diff、diffstat、file、find、git、gitview、ln、locate、lsattr、mattrib、mc、mcopy、mdel、mdir、mktemp、mmove、mread、mren、mshowfat、mtools、mtoolstest、mv、od、paste、patch、rcp、rhmask、rm、slocate、split、tee、tmpwatch、touch、umask、whereis、which、cat、chattr、chgrp、chmod、chown、cksum、cmp、cp、cut、indent
+### 文本
 
-### 磁盘管理
+grep 、sed、awk 被称为 Linux 中的文本三剑客。
 
-cd、df、dirs、du、edquota、eject、lndir、ls、mcd、mdeltree、mdu、mkdir、mlabel、mmd、mmount、mrd、mzip、pwd、quota、quotacheck、quotaoff、quotaon、repquota、rmdir、rmt、stat、tree、umount
+- [grep](https://linux.mcbilla.com/c/grep.html)：适合单纯的查找或匹配文本
+- [sed](https://linux.mcbilla.com/c/sed.html)：适合编辑匹配到的文本
+- [awk](https://linux.mcbilla.com/c/awk.html)：适合格式化文本，对文本进行较复杂格式处理
 
-### 磁盘维护
+其他常用命令：
 
-badblocks、cfdisk、dd、e2fsck、ext2ed、fdisk、fsck.ext2、fsck、fsck.minix、fsconf、hdparm、losetup、mbadblocks、mformat、mkbootdisk、mkdosfs、mke2fs、mkfs.ext2、mkfs、mkfs.minix、mkfs.msdos、mkinitrd、mkisofs、mkswap、mpartition、sfdisk、swapoff、swapon、symlinks、sync
+- [more](https://linux.mcbilla.com/c/more.html)：显示文件内容，每次显示一屏
+- [sort](https://linux.mcbilla.com/c/sort.html)：对文本文件中所有行进行排序
+- [uniq](https://linux.mcbilla.com/c/uniq.html)：检查和删除文本文件中的重复行
+- [wc](https://linux.mcbilla.com/c/wc.html)：统计文件的字节数、字数、行数
+- [head](https://linux.mcbilla.com/c/head.html)：显示文件的开头部分
+- [tail](https://linux.mcbilla.com/c/tail.html)：在屏幕上显示指定文件的末尾若干行
+- [cat](https://linux.mcbilla.com/c/cat.html)：连接多个文件并打印到标准输出
+- [more](https://linux.mcbilla.com/c/more.html)：显示文件内容，每次显示一屏
+- [less](https://linux.mcbilla.com/c/less.html)：分屏上下翻页浏览文件内容
 
-### 系统设置
+### 系统
 
-alias、apmd、aumix、bind、chkconfig、chroot、clock、crontab、declare、depmod、dircolors、dmesg、enable、eval、export、fbset、grpconv、grpunconv、hwclock、insmod、kbdconfig、lilo、liloconfig、lsmod、minfo、mkkickstart、modinfo、modprobe、mouseconfig、ntsysv、passwd、pwconv、pwunconv、rdate、resize、rmmod、rpm、set、setconsole、setenv、setup、sndconfig、SVGAText Mode、timeconfig、ulimit、unalias、unset
+- [top](https://linux.mcbilla.com/c/top.html)：显示系统的运行状态和进程信息
+- [sar](https://linux.mcbilla.com/c/sar.html)：系统运行状态统计工具
+- [pstack](https://linux.mcbilla.com/c/pstack.html)：分析进程调用栈
+- [htop](https://linux.mcbilla.com/c/htop.html)：一个交互式的进程查看器，可以动态观察系统进程状况
+- [ps](https://linux.mcbilla.com/c/ps.html)：报告当前系统的进程状态
+- [alias](https://linux.mcbilla.com/c/alias.html)：定义或显示别名
 
-### 系统管理
+### 用户
 
-adduser、chfn、chsh、date、exit、finger、free、fwhois、gitps、groupdel、groupmod、halt、id、kill、last、lastb、login、logname、logout、logrotate、newgrp、nice、procinfo、ps、pstree、reboot、renice、rlogin、rsh、rwho、screen、shutdown、sliplogin、su、sudo、suspend、swatch、tload、top、uname、useradd、userconf、userdel、usermod、vlock、w、who、whoami、whois
+- [chmod](https://linux.mcbilla.com/c/chmod.html)：用来变更文件或目录的权限
+- [sudo](https://linux.mcbilla.com/c/sudo.html)：以其他身份来执行命令
 
-### 文本处理
+### 文件
 
-awk、col、colrm、comm、csplit、ed、egrep、ex、fgrep、fmt、fold、grep、ispell、jed、joe、join、look、mtype、pico、rgrep、sed、sort、spell、tr、uniq、vi、wc
+- [mv](https://linux.mcbilla.com/c/mv.html)：对文件或目录重命名或者移动
+- [cp](https://linux.mcbilla.com/c/cp.html)：将源文件或目录复制到目标文件或目录中
+- [rm](https://linux.mcbilla.com/c/rm.html)：删除指定的文件和目录
+- [find](https://linux.mcbilla.com/c/find.html)：在指定目录下查找文件和目录
+- [touch](https://linux.mcbilla.com/c/touch.html)：创建新的空文件和更新文件时间戳
+- [ls](https://linux.mcbilla.com/c/ls.html)：显示目录内容列表
+- [lsof](https://linux.mcbilla.com/c/lsof.html)：显示Linux中的文件打开情况
+- [ln](https://linux.mcbilla.com/c/ln.html)：为文件创建链接
+- [tar](https://linux.mcbilla.com/c/tar.html)：打包、压缩和解压文件
+- [zip](https://linux.mcbilla.com/c/zip.html)：压缩文件并生成zip文件
+- [unzip](https://linux.mcbilla.com/c/unzip.html)：解压缩zip文件
+- [rar](https://linux.mcbilla.com/c/rar.html)：压缩文件并生成rar文件
+- [unrar](https://linux.mcbilla.com/c/unrar.html)：解压缩rar文件
 
-### 网络通讯
+### 包管理
 
-dip、getty、mingetty、ppp-off、smbd(samba daemon)、telnet、uulog、uustat、uux、cu、dnsconf、efax、httpd、ip、ifconfig、mesg、minicom、nc、netconf、netconfig、netstat、ping、ping6、pppstats、samba、setserial、shapecfg(shaper configuration)、smbd(samba daemon)、statserial(status ofserial port)、talk、tcpdump、testparm(test parameter)、traceroute、tty(teletypewriter)、uuname、wall(write all)、write、ytalk、arpwatch、apachectl、smbclient(samba client)、pppsetup
+- [pip](https://linux.mcbilla.com/c/pip.html)：Python 编程语言中的包管理器，用于安装和管理第三方 Python 模块
+- [apt](https://linux.mcbilla.com/c/apt.html)：Debian Linux发行版中的APT软件包管理工具
+- [yum](https://linux.mcbilla.com/c/yum.html)：基于RPM的软件包管理器
+- [dnf](https://linux.mcbilla.com/c/dnf.html)：新一代的RPM软件包管理器
 
-### 设备管理
+### 其他
 
-dumpkeys、loadkeys、MAKEDEV、rdev、setleds
-
-### 电子邮件与新闻组
-
-archive、ctlinnd、elm、getlist、inncheck、mail、mailconf、mailq、messages、metamail、mutt、nntpget、pine、slrn、X WINDOWS SYSTEM、reconfig、startx(start X Window)、Xconfigurator、XF86Setup、xlsatoms、xlsclients、xlsfonts
-
-### 其他命令
-
-yes 
+- [xargs](https://linux.mcbilla.com/c/xargs.html)：给其他命令传递参数的一个过滤器
+- [nohup](https://linux.mcbilla.com/c/nohup.html)：将程序以忽略挂起信号的方式运行起来
+- [管道符 `|`](https://linux.mcbilla.com/c/管道符.html) ：把前一个命令原本要输出到屏幕的信息当做后一个命令的标准输入。
+- [重定向 `>`](https://linux.mcbilla.com/c/重定向.html) ：输入/输出重定向
+- [crontab](https://linux.mcbilla.com/c/crontab.html)：提交和管理用户的需要周期性执行的任务
 
 ## Linux学习资源整理
 
