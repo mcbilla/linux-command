@@ -1,12 +1,13 @@
 <p align="center">
-  <a href="https://jaywcjlove.github.io/linux-command">
+  <a href="https://linux.mcbilla.com/">
     <img src="./template/img/banner.svg?sanitize=true">
   </a>
   <h1>Linux Command</h1>
 </p>
+
 ## Linux命令分类
 
-**这里存放Linux 命令大全并不全，你可以通过[linux-command](https://linux-command-bay-two.vercel.app/)来搜索，它是把 [command](./assets/command) 目录里面搜集的命令，生成了静态HTML并提供预览以及索引搜索。**
+**这里存放Linux 命令大全并不全，你可以通过[linux-command](https://linux.mcbilla.com/)来搜索，它是把 [command](./assets/command) 目录里面搜集的命令，生成了静态HTML并提供预览以及索引搜索。**
 
 ## 常用命令
 
