@@ -98,7 +98,7 @@ ln dir1 dir2
 ln: 'dir1': hard link not allowed for directory
 ```
 
-### 为一个文件创建符号链接
+### 为一个文件创建软链接
 
 ```bash
 # 创建一个名为file3.txt的文件，并写入一些内容
@@ -112,7 +112,7 @@ ls -i file3.txt file4.txt
 cat file3.txt file4.txt
 ```
 
-### 为一个目录创建符号链接
+### 为一个目录创建软链接
 
 ```bash
 # 创建一个名为dir3的目录，并在其中创建一些文件
