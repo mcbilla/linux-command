@@ -111,11 +111,20 @@ $ du -h /home/test
 1.1M    /home/test
 ```
 
-### 只显示目录大小总和
+### 显示当前目录大小
 
 ```shell
-ubuntu@VM-0-14-ubuntu:~/git-work/linux-command/assets$ du -s .
+# 只显示当前目录总大小
+$ du -s .
 1932    .
+
+# 显示当前目录下目录和文件大小（不包含子目录和子文件）
+$ du -sh *
+4.0K    conf
+234M    data
+0       logs
+514M    mysqlbinlog
+0       mysql-files
 ```
 
 ### 文件从大到小排序
