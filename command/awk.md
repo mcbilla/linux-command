@@ -206,7 +206,7 @@ cat /etc/passwd |awk -F ':' '{if($3 < 100)print $0}'
 cat /etc/passwd |awk -F ':' '$3 < 100{print $0}'
 
 # 打印第5到第10行
-cat /etc/passwd |awk -F ':' 'NR >= 	5 && NR <= 10{print $0}' file.txt
+cat /etc/passwd |awk -F ':' 'NR >= 5 && NR <= 10{print $0}' file.txt
 
 ```
 
