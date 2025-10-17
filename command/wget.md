@@ -17,14 +17,34 @@ wget支持HTTP，HTTPS和FTP协议，可以使用HTTP代理。所谓的自动下
 4. **设置方便简单** 可能，习惯图形界面的用户已经不是太习惯命令行了，但是，命令行在设置上其实有更多的优点，最少，鼠标可以少点很多次，也不要担心是否错点鼠标；
 5. **程序小，完全免费** 程序小可以考虑不计，因为现在的硬盘实在太大了；完全免费就不得不考虑了，即使网络上有很多所谓的免费软件，但是，这些软件的广告却不是我们喜欢的。
 
+## 适用的Linux版本
 
-###  语法
+* 对于 Debian Linux，例如 Ubuntu、Linux Mint、elementaryOS
+
+  ```
+  sudo apt install wget
+  ```
+
+* 对于 Red Hat Linux，例如 CentOS
+
+  ```
+  yum -y install wget
+  ```
+
+* 对于 Arch Linux，例如 Manjaro
+
+  ```
+  pacman -S wget
+  ```
+
+
+##  语法
 
 ```shell
 wget [参数] [URL地址]
 ```
 
-###  选项
+##  选项
 
 ```shell
 启动参数：
@@ -129,11 +149,7 @@ FTP 选项参数：
 wget -S –-spider url 不下载只显示过程
 ```
 
-###  参数
-
-URL：下载指定的URL地址。
-
-###  实例
+##  实例
 
 **使用wget下载单个文件** 
 

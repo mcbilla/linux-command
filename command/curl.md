@@ -11,9 +11,27 @@ curl
 
 curl 命令在大多数 Linux 发行版中都是默认安装的，你可以用`curl --version`命令来查看你的系统中的curl版本和支持的协议。如果你的系统中没有curl命令，你可以用以下命令来安装：
 
-- 在基于Debian的系统中，如Ubuntu，你可以用`sudo apt install curl`命令来安装。
-- 在基于Red Hat的系统中，如CentOS，你可以用`sudo yum install curl`命令来安装。注意，如果你的系统是CentOS 8，你需要用`sudo dnf install curl`命令来安装，因为CentOS 8使用了新的包管理工具dnf。
-- 在基于Arch的系统中，如Manjaro，你可以用`sudo pacman -S curl`命令来安装。
+- 在基于 Debian 的系统中，如 Ubuntu
+
+  ```
+  sudo apt install curl
+  ```
+
+- 在基于 Red Hat 的系统中，如 CentOS
+
+  ```
+  # CentOS7
+  sudo yum install curl
+  
+  # CentOS8
+  sudo dnf install curl
+  ```
+
+- 在基于 Arch 的系统中，如 Manjaro
+
+  ```
+  sudo pacman -S curl
+  ```
 
 安装完成后，你可以用`curl --help`命令来查看curl的用法和选项。
 
