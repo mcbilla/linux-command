@@ -3,13 +3,85 @@ pip
 
 Python 编程语言中的包管理器，用于安装和管理第三方 Python 模块
 
-## 语法
+更多的用法可以参考官方文档 https://pypi.org/project/pip/](https://pypi.org/project/pip/)
+
+## 适用的Linux版本
+
+Pip 是 Python 的包管理工具，通常随着 Python 的安装一起安装。如果找不到命令可以通过以下方式安装：
+
+- Debian/Ubuntu/Deepin/Kali Linux/Raspbian等基于Debian的系统，可以使用apt或apt-get命令来安装或更新pip：
+
+```bash
+sudo apt update
+sudo apt install python3-pip # Python 3
+sudo apt install python-pip # Python 2
+```
+
+- CentOS 7可以使用yum命令来安装或更新pip，但需要先启用EPEL仓库：
+
+```bash
+sudo yum install epel-release
+sudo yum install python3-pip # Python 3
+sudo yum install python-pip # Python 2
+```
+
+- CentOS 8可以使用dnf命令来安装或更新pip：
+
+```bash
+sudo dnf install python3-pip # Python 3
+sudo dnf install python2-pip # Python 2
+```
+
+- Fedora可以使用dnf命令来安装或更新pip：
+
+```bash
+sudo dnf install python3-pip # Python 3
+sudo dnf install python2-pip # Python 2
+```
+
+- Alpine Linux可以使用apk命令来安装或更新pip：
+
+```bash
+sudo apk add py3-pip # Python 3
+sudo apk add py-pip # Python 2
+```
+
+- Arch Linux可以使用pacman命令来安装或更新pip：
+
+```bash
+sudo pacman -S python-pip # Python 3
+sudo pacman -S python2-pip # Python 2
+```
+
+检查 `pip` 是否已安装
+
+```bash
+pip --version
+```
+
+确保您使用的是最新版本的 `pip`，您可以运行以下命令来**升级**
+
+```bash
+python -m pip install --upgrade pip
+```
+
+如果使用 pip 安装包时报错 `No such file or directory: '/tmp/pip-build-qxKbBk/numpy/setup.py'`，原因是 python 不再支持维护该版本的 python/pip，可以更新 python 或使用与 python 对应版本的 pip，这时候需要手动安装 pip。
+
+```
+# 下载python版本对应的pip
+wget https://bootstrap-pypa-io.ingress.us-east-2.psfhosted.computer/pip/2.7/get-pip.py
+
+# 安装刚才的 get-pip.py 脚本
+python get-pip.py
+```
+
+# 语法
 
 ```bash
 pip <命令> [选项]
 ```
 
-## 选项
+# 选项
 
 命令
 
@@ -66,39 +138,9 @@ help                        显示命令的帮助信息。
 --use-deprecated <feature>  启用在将来将被删除的已弃用功能。
 ```
 
-### 安装
+## 示例
 
-Pip 是 Python 的包管理工具，通常随着 Python 的安装一起安装。确保你的 Python 版本是 3.4 或更高版本。
-
-```bash
-# Ubuntu系统
-sudo apt install python3-pip
-```
-
-```bash
-# CentOS
-sudo yum install python3-pip
-```
-
-如果需要更新 Pip，可以运行以下命令：
-
-```bash
-python -m pip install --upgrade pip
-```
-
-检查 `pip` 是否已安装
-
-```bash
-pip --version
-```
-
-确保您使用的是最新版本的 `pip`，您可以运行以下命令来**升级**
-
-```bash
-python -m pip install --upgrade pip
-```
-
-## 安装包
+### 安装包
 
 通过 Pip 安装 Python 包非常简单。使用以下命令：
 
@@ -112,7 +154,7 @@ pip install <package_name>
 pip install requests
 ```
 
-## 卸载包
+### 卸载包
 
 要卸载已安装的包，使用以下命令：
 
@@ -126,7 +168,7 @@ pip uninstall package_name
 pip uninstall requests
 ```
 
-## 查看已安装的包
+### 查看已安装的包
 
 你可以使用以下命令查看当前环境中已安装的所有包及其版本：
 
@@ -134,7 +176,7 @@ pip uninstall requests
 pip list
 ```
 
-## 导出和导入依赖关系
+### 导出和导入依赖关系
 
 使用 `pip freeze` 命令可以将当前环境中的所有包及其版本导出到一个文本文件，通常命名为 `requirements.txt`：
 
@@ -148,7 +190,7 @@ pip freeze > requirements.txt
 pip install -r requirements.txt
 ```
 
-## 安装特定版本的包
+### 安装特定版本的包
 
 如果需要安装特定版本的包，可以在包名后面添加版本号：
 
@@ -156,7 +198,7 @@ pip install -r requirements.txt
 pip install package_name==1.2.3
 ```
 
-## 搜索包
+### 搜索包
 
 要搜索可用的 Python 包，可以使用 `pip search` 命令：
 
@@ -164,7 +206,7 @@ pip install package_name==1.2.3
 pip search package_name
 ```
 
-## 安装开发版本
+### 安装开发版本
 
 有时你可能需要安装包的开发版本。通常，开发版本存储在版本控制系统中（如 GitHub）：
 
@@ -174,8 +216,20 @@ pip install git+https://github.com/user/repo.git
 
 这将安装存储库的最新版本。
 
-以上是一些常用的 Pip 命令，希望这个简要教程能够帮助你更好地使用 Python 包管理工具。
+### 清除缓存
 
-## 官网
+```
+# 查看缓存信息
+pip cache info
 
-更多安装使用方法可以访问官网学习：[https://pypi.org/project/pip/](https://pypi.org/project/pip/)
+# 查看缓存列表
+pip cache list
+
+# 查看缓存路径
+pip cache dir
+
+# 清除缓存
+pip cache purge
+
+```
+
